@@ -35,6 +35,7 @@ def tokenize(text: str) -> list[str]:
 
 
 class EvidenceIndex:
+    """A simple index based on the document "database" that consists of Markdown files."""
     def __init__(self, documents: list[dict]):
         self.documents = documents
         self.document_dict = {doc["doc_id"]: doc for doc in documents}
@@ -95,6 +96,15 @@ class EvidenceIndex:
             self.idf[idx] = np.log((1 + n) / (word_counter[word] + 1)) + 1
 
     def embed_texts(self, texts: list[str]):
+        """Converts a list of texts from characters to TF-IDF vector embeddings.
+
+        Args:
+            texts: A list of text fragments for conversion.
+
+        Returns:
+            A (n,V) vector of embeddings, where n is the number of texts and V is
+            the size of the vocabulary.
+        """
         embeddings = np.zeros((len(texts), len(self.vocab)))
         for idx, text in enumerate(texts):
             word_count = Counter(tokenize(text))
