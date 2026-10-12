@@ -1,0 +1,51 @@
+{
+  "vivian": {
+    "name": "Lady Vivian Blackwood",
+    "role": "wife of the victim",
+    "timeline": [
+      {"from": "19:30", "to": "21:15", "where": "dining room, at dinner", "witnesses": ["everyone at dinner"]},
+      {"from": "21:15", "to": "21:55", "where": "drawing room, taking coffee", "witnesses": ["Colonel Ashby", "Dr. Finch"]},
+      {"from": "22:00", "to": "23:25", "where": "conservatory, playing bezique", "witnesses": ["Colonel Ashby", "Albert Hargreaves (brought tea at 22:30)"]}
+    ]
+  },
+  "clara": {
+    "name": "Clara Blackwood",
+    "role": "niece of the victim",
+    "timeline": [
+      {"from": "19:30", "to": "21:15", "where": "dining room, at dinner", "witnesses": ["everyone at dinner"]},
+      {"from": "21:20", "to": "21:45", "where": "library, arguing with Lord Blackwood", "witnesses": ["Albert Hargreaves (overheard)"]},
+      {"from": "21:50", "to": "23:00", "where": "music room, playing the piano", "witnesses": ["Molly Reed (heard the piano from the linen room)"]},
+      {"from": "23:00", "to": "23:25", "where": "her bedroom", "witnesses": []}
+    ]
+  },
+  "finch": {
+    "name": "Dr. Lionel Finch",
+    "role": "family physician, house guest",
+    "timeline": [
+      {"from": "19:30", "to": "21:15", "where": "dining room, at dinner", "witnesses": ["everyone at dinner"]},
+      {"from": "21:15", "to": "21:55", "where": "drawing room, taking coffee", "witnesses": ["Lady Vivian", "Colonel Ashby"]},
+      {"from": "21:55", "to": "23:25", "where": "his room in the guest wing, reading", "witnesses": []}
+    ]
+  },
+  "ashby": {
+    "name": "Colonel Rupert Ashby",
+    "role": "old army friend, house guest",
+    "timeline": [
+      {"from": "19:30", "to": "21:15", "where": "dining room, at dinner", "witnesses": ["everyone at dinner"]},
+      {"from": "21:15", "to": "21:55", "where": "drawing room, taking coffee", "witnesses": ["Lady Vivian", "Dr. Finch"]},
+      {"from": "22:00", "to": "23:25", "where": "conservatory, playing bezique", "witnesses": ["Lady Vivian", "Albert Hargreaves (brought tea at 22:30)"]}
+    ]
+  },
+  "hargreaves": {
+    "name": "Albert Hargreaves",
+    "role": "butler",
+    "timeline": [
+      {"from": "19:30", "to": "21:15", "where": "dining room, serving dinner", "witnesses": ["everyone at dinner"]},
+      {"from": "21:15", "to": "22:10", "where": "pantry and kitchen", "witnesses": ["Mrs. Pike"]},
+      {"from": "22:10", "to": "22:20", "where": "pantry, then the library to deliver the decanter", "witnesses": ["Mrs. Pike (saw him fill it)", "Lord Blackwood"]},
+      {"from": "22:20", "to": "22:30", "where": "pantry, polishing silver", "witnesses": ["Mrs. Pike"]},
+      {"from": "22:30", "to": "22:40", "where": "taking tea to the conservatory", "witnesses": ["Lady Vivian", "Colonel Ashby"]},
+      {"from": "22:40", "to": "23:20", "where": "pantry, polishing silver", "witnesses": ["Mrs. Pike"]}
+    ]
+  }
+}
