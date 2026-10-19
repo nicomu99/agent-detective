@@ -16,15 +16,22 @@ Both take (system, messages, tools) and return the next assistant message:
                   accuse Colonel Ashby
               Anything else is treated as a search.
 """
-
 import os
 import re
 import uuid
+import logging
+
+logger = logging.getLogger(__name__)
 
 MODEL = "claude-opus-5-5"  # or "claude-sonnet-5-5" for a cheaper model
 
 
 def has_api_key() -> bool:
+    """Check whether the env-variable ANTHROPIC_API_KEY key is set.
+
+    Returns:
+        True if the API key has been set, else False.
+    """
     return bool(os.environ.get("ANTHROPIC_API_KEY"))
 
 
@@ -75,6 +82,8 @@ def _say(text: str) -> dict:
 
 
 def fake_model(system: str, messages: list[dict], tools: list[dict]) -> dict:
+    """Send a fake request."""
+    logger.info("Sending request. System prompt length: %s. Tool count: %s.", len(system), len(tools))
     last = messages[-1]["content"]
     if isinstance(last, list) and any(b.get("type") == "tool_result" for b in last):
         # A tool just ran: "answer" by passing its output straight back.

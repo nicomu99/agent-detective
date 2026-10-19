@@ -1,4 +1,4 @@
-"""Part 1, the RAG part: search over the case files.
+"""The RAG part: search over the case files.
 
     index = EvidenceIndex.from_dir(Path("case_files"))
     index.search("brandy decanter", k=3)   # -> [{"doc_id", "title", "snippet", "score"}, ...]

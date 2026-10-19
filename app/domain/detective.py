@@ -1,10 +1,10 @@
-"""Part 2, the agent part: Sergeant Wilkes, a detective's assistant with tools."""
+"""The agent part: Sergeant Wilkes, a detective's assistant with tools."""
 
 import json
 import hashlib
 from pathlib import Path
 
-from .evidence import EvidenceIndex
+from app.domain.evidence import EvidenceIndex
 
 # Who did it, hashed so that reading the code doesn't spoil the mystery
 _CULPRIT_HASH = "e69500e67ba4c7c11ef0f68475481ab73ac14b60c0362798cf9e38876a7ce536"
