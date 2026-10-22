@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: agent-detective
+  name: agent-detective
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: agent-detective
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: agent-detective
+    spec:
+      volumes:
+      - name: web-config
+        configMap:
+          name: case-files
+      containers:
+      - image: muellern99/agent-detective:0.0.1
+        name: agent-detective
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /app/case_files
+          name: web-config
+        env:
+        - name: CASE_DIR
+          value: /app/case_files
+        - name: ANTHROPIC_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: anthropic
+              key: ANTHROPIC_API_KEY
+        - name: DETECTIVE_MODEL
+          value: claude
+        resources: {}

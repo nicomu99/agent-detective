@@ -71,7 +71,7 @@ All configuration comes from environment variables, so the same build runs local
 
 Invalid values make the service **refuse to start**, so a misconfigured container fails immediately instead of misbehaving later.
 
-## Running
+## Running locally
 
 ```bash
 uv run uvicorn app.main:app --reload
@@ -84,6 +84,37 @@ DETECTIVE_MODEL=claude ANTHROPIC_API_KEY=sk-ant-... uv run uvicorn app.main:app 
 ```
 
 Run the tests with `uv run pytest`.
+
+## Running with K8s
+
+The case files are not baked into the image, so the campaign can be changed without needing to update it. Instead,
+the cluster will read them from a ConfigMap:
+
+```bash
+kubectl create configmap case-files --from-file case_files/
+```
+
+By default, the application runs in the cluster using the `claude` mode. This requires an API key, which is read form
+a Secret. Create a file `.env` with a key-value pair `ANTHROPIC_API_KEY=sk...`. Then run
+
+```bash
+kubectl create secret generic anthropic --from-env-file=.env
+```
+
+Then apply the deployment. A docker image has already been created.
+
+```bash
+kubectl apply -f deploy.yaml
+```
+
+Use port-forwaring to talk to the system from your local machine: 
+
+```bash
+kubectl port-forward deployments/agent-detective 8080:8080
+```
+
+If you want to play the game locally, without using an LLM, manually delete the `ANTHROPIC_API_KEY` and
+`DETECTIVE_MODEL` environment variables from `deploy.yaml` and skip creating a Secret.
 
 ## Using the API with curl
 
@@ -149,17 +180,10 @@ Every response carries an `X-Request-ID` header. Send your own (`-H "X-Request-I
 
 ## Roadmap: Docker and Kubernetes
 
-Next up is running the service in containers. Already prepared:
-
-- **Config via env vars.** In Kubernetes these come from a `ConfigMap`, and `ANTHROPIC_API_KEY` from a `Secret`, never baked into the image.
-- **Probes.** `/health` maps to the `livenessProbe` and `/ready` to the `readinessProbe`.
-- **Fail fast.** Bad config crashes startup, which shows up as `CrashLoopBackOff` instead of a half-working pod.
-- **Request IDs.** These let you follow one request through the logs of many pods.
-
 Still to do:
 
-- [ ] `Dockerfile` with a multi-stage build using uv (`uv sync --frozen --no-dev`), running as a non-root user, started with `uvicorn app.main:app --host 0.0.0.0 --port 8000`
-- [ ] `.dockerignore` (`.venv`, `__pycache__`, `.git`)
-- [ ] Decide whether the case files are baked into the image or mounted as a volume, with `CASE_DIR` pointing at them
+- [x] `Dockerfile` with a multi-stage build using uv (`uv sync --frozen --no-dev`), running as a non-root user, started with `uvicorn app.main:app --host 0.0.0.0 --port 8000`
+- [x] `.dockerignore` (`.venv`, `__pycache__`, `.git`)
+- [x] Decide whether the case files are baked into the image or mounted as a volume, with `CASE_DIR` pointing at them
 - [ ] Kubernetes manifests: `Deployment`, `Service`, `ConfigMap`, `Secret`
 - [ ] Replace the in-memory `InvestigationStore` with Redis, because with more than one replica the next request can hit a pod that has never seen the investigation

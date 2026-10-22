@@ -41,6 +41,10 @@ def load_settings() -> Settings:
             misbehaving later.
     """
     case_dir = Path(os.environ.get("CASE_DIR", default=ROOT / "case_files"))
+    if not case_dir.exists():
+        raise ValueError(
+            f"Path {case_dir} could not be found. Make sure to set the correct path using -e CASE_DIR=<path>"
+        )
 
     model = os.environ.get("DETECTIVE_MODEL", "fake").strip().lower()
     if model not in ("fake", "claude"):
