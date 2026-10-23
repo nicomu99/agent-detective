@@ -36,4 +36,6 @@ spec:
               key: ANTHROPIC_API_KEY
         - name: DETECTIVE_MODEL
           value: claude
+        ports:
+        - containerPort: 8080
         resources: {}

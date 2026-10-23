@@ -1,0 +1,167 @@
+apiVersion: v1
+data:
+  butler-statement.md: |
+    # Statement of Albert Hargreaves, butler
+
+    At about 21:30 I passed the library and heard his lordship arguing with Miss Clara about money. He said: "You'll not see a penny more until you've learned some sense." Miss Clara came out at about 21:45 in tears.
+
+    At 22:15 I brought his lordship a freshly filled brandy decanter. He was writing a letter and said: "Not now, Hargreaves. This is a letter I should have written years ago." I left at once.
+
+    From 22:20 I polished the silver in the pantry. At 22:30 I took a tray of tea to Lady Vivian and the Colonel in the conservatory and was back in the pantry by 22:40. Mrs. Pike can tell you I did not leave again.
+
+    At 23:20 I went to collect the decanter and found his lordship dead. I noticed the library fire had been stoked up high, though I had not touched it since nine o'clock. I was in my usual black livery all evening.
+  case-summary.md: |
+    # Case summary: the death of Lord Edmund Blackwood
+
+    Lord Edmund Blackwood, aged 61, was found dead in the library of Blackwood Manor at 23:20 on Saturday 14 November 1931. The butler, Albert Hargreaves, found him slumped over his writing desk with an empty brandy glass beside him.
+
+    A storm flooded the lane to the village that evening. Nobody arrived at or left the manor between 19:00 and the arrival of the police at 08:00 the next morning. Whoever did this was inside the house.
+
+    People in the house that night: Lady Vivian Blackwood (his wife), Clara Blackwood (his niece, 24), Dr. Lionel Finch (the family physician, staying for the weekend), Colonel Rupert Ashby (retired, an old army friend, staying for the weekend), Albert Hargreaves (butler), Mrs. Edna Pike (cook) and Molly Reed (housemaid).
+
+    The evening, as everyone agrees: dinner in the dining room from 19:30 to 21:15. Lord Blackwood then went to the library alone. The guests took coffee in the drawing room until about 21:50, when they went their separate ways. The alarm was raised at about 23:25.
+  clara-statement.md: |
+    # Statement of Miss Clara Blackwood, niece
+
+    Yes, I argued with Uncle Edmund. I have debts, and he refused to help me again. I left the library at about a quarter to ten, very upset.
+
+    I went straight to the music room and played the piano to calm down. I played until about eleven and then went up to bed. Molly was in the linen room next door; she must have heard me.
+
+    I know I inherit the manor. Everybody knows. I was angry with him, but I would never have hurt him.
+  colonel-ashby-statement.md: |
+    # Statement of Colonel Rupert Ashby
+
+    Played cards with Lady Vivian in the conservatory from ten until the alarm. Never left the room; neither did she. The butler brought tea at half past ten.
+
+    I'll be frank: I owed Edmund five hundred pounds, and he had been pressing me for it. Not a motive for murder, Inspector. A gentleman settles his debts.
+
+    On my way to the conservatory, at about five to ten, I saw Finch going upstairs with that black medical bag of his. Said he was turning in early with a book. I wore my mess jacket all evening.
+  cook-statement.md: |
+    # Statement of Mrs. Edna Pike, cook
+
+    I was in the kitchen from seven until past midnight. The pantry door is right across from my table. Mr. Hargreaves opened a new, sealed bottle of brandy and filled the decanter there at about 22:10. He was in the pantry with his silver all evening, except for ten minutes or so when he took tea out at half past ten.
+
+    Earlier, at about half past six, before dinner, Dr. Finch came down to the kitchen. He asked which decanter his lordship drinks from in the evenings. "Doctor's orders," he said, "for his heart." I thought it odd, a doctor asking about brandy.
+
+    At dinner the gentlemen were a sight. Dr. Finch was in that grey tweed jacket of his; he never dresses for dinner, that one. The Colonel wore his old regimental mess jacket, red as a pillar box.
+  coroner-report.md: |
+    # Coroner's report
+
+    Cause of death: poisoning by digitalis, a heart drug made from the foxglove plant. A large dose was found in the stomach, in the dregs of the brandy glass on the desk, and in the brandy decanter itself.
+
+    Time of death: between 22:30 and 23:00. A dose this large acts within roughly fifteen to thirty minutes, so the poisoned brandy was most likely drunk between 22:15 and 22:45.
+
+    Lord Blackwood had a weak heart, but he had never been prescribed digitalis. His own physician would know the drug and the dose well; an ordinary person would not.
+
+    A bruise on the left temple matches the corner of the writing desk. He struck it as he collapsed. There are no signs of a struggle and no other injuries.
+  dr-finch-statement.md: |
+    # Statement of Dr. Lionel Finch, physician
+
+    I have been the Blackwood family doctor for twelve years. After coffee I went up to my room in the guest wing at about five to ten and read until I heard the commotion. I did not leave my room and I did not go near the library.
+
+    Edmund's heart was weak. If digitalis was involved, perhaps he dosed himself; he knew I carried it. I keep my bag in my room, but the door does not lock, and anyone could have taken from it.
+
+    As for whatever Edmund said at dinner, I have no idea what he meant. We were on excellent terms.
+  floor-plan.md: |
+    # Floor plan of Blackwood Manor
+
+    Ground floor, east wing: the library sits at the far end of the east corridor. The back stairs start beside the library door and lead straight up to the guest wing.
+
+    Ground floor, west wing: the conservatory, at the far west end. Next to the main hall are the music room and, through a thin wall, the linen room.
+
+    Centre: the main hall with the grand staircase, the dining room and the drawing room.
+
+    Below stairs: the kitchen and the butler's pantry, across a passage from each other.
+
+    First floor: the family bedrooms over the west wing, and the guest wing over the east wing, where Dr. Finch and Colonel Ashby were staying. From the conservatory, the only way to the library is across the main hall and down the whole east corridor.
+  lady-vivian-statement.md: |
+    # Statement of Lady Vivian Blackwood, wife
+
+    After coffee I went to the conservatory with Colonel Ashby at about ten o'clock, and we played bezique until we heard Hargreaves shouting at about 23:25. Neither of us left the room. Hargreaves brought us tea at half past ten.
+
+    My husband and I were not close these last years, I won't pretend otherwise. But at dinner he was in an odd mood. He told me he would "finally deal with that business with Lionel" tonight. He wouldn't say what he meant, and Dr. Finch went quite pale.
+  last-will.md: |
+    # Summary of the last will, from the family solicitor
+
+    Miss Clara Blackwood inherits Blackwood Manor and the estate.
+
+    Lady Vivian Blackwood receives an annuity of two thousand pounds a year and the right to live at the manor for life.
+
+    Albert Hargreaves receives two hundred pounds "for long and loyal service".
+
+    All debts owed to Lord Blackwood are forgiven on his death, which includes the five hundred pounds owed by Colonel Ashby.
+
+    Dr. Lionel Finch is not mentioned in the will.
+  maid-statement.md: |
+    # Statement of Molly Reed, housemaid
+
+    From about 21:50 I was folding linen in the linen room, which is next door to the music room. Miss Clara was playing the piano the whole time, sad pieces, Chopin I think. She never stopped for longer than a minute or two until about eleven o'clock.
+
+    At about 22:40 I carried a pile of sheets up the back stairs, which start at the end of the east corridor, right by the library. The storm had blown out half the lamps. I saw a gentleman in a grey tweed jacket come out of the library carrying a small black bag. He hurried up the back stairs ahead of me towards the guest wing. I never saw his face.
+
+    I went back to the linen room after that and heard the piano again until eleven.
+  search-of-the-house.md: |
+    # Police search of the house, Sunday morning
+
+    Library: the brandy decanter and glass were taken for analysis; both contain digitalis. In the fireplace, under the ashes, were the half-burnt pages of a letter in Lord Blackwood's handwriting, addressed to the General Medical Council. The readable part says: "...can no longer stay silent about Dr. L. F., who has been writing prescriptions for morphine in the names of my tenants and selling the..." The rest is burnt.
+
+    Guest room of Dr. Finch: his black medical bag holds a bottle of digitalis tincture that is almost empty. His own ledger records that it was refilled on 10 November. A grey tweed jacket hung over the chair; there is a fresh brandy stain on its right cuff.
+
+    Room of Miss Clara: IOUs to a bookmaker totalling three hundred pounds.
+
+    Room of Colonel Ashby: a letter from Lord Blackwood, dated October, demanding repayment of five hundred pounds by Christmas.
+  suspects.json: |
+    {
+      "vivian": {
+        "name": "Lady Vivian Blackwood",
+        "role": "wife of the victim",
+        "timeline": [
+          {"from": "19:30", "to": "21:15", "where": "dining room, at dinner", "witnesses": ["everyone at dinner"]},
+          {"from": "21:15", "to": "21:55", "where": "drawing room, taking coffee", "witnesses": ["Colonel Ashby", "Dr. Finch"]},
+          {"from": "22:00", "to": "23:25", "where": "conservatory, playing bezique", "witnesses": ["Colonel Ashby", "Albert Hargreaves (brought tea at 22:30)"]}
+        ]
+      },
+      "clara": {
+        "name": "Clara Blackwood",
+        "role": "niece of the victim",
+        "timeline": [
+          {"from": "19:30", "to": "21:15", "where": "dining room, at dinner", "witnesses": ["everyone at dinner"]},
+          {"from": "21:20", "to": "21:45", "where": "library, arguing with Lord Blackwood", "witnesses": ["Albert Hargreaves (overheard)"]},
+          {"from": "21:50", "to": "23:00", "where": "music room, playing the piano", "witnesses": ["Molly Reed (heard the piano from the linen room)"]},
+          {"from": "23:00", "to": "23:25", "where": "her bedroom", "witnesses": []}
+        ]
+      },
+      "finch": {
+        "name": "Dr. Lionel Finch",
+        "role": "family physician, house guest",
+        "timeline": [
+          {"from": "19:30", "to": "21:15", "where": "dining room, at dinner", "witnesses": ["everyone at dinner"]},
+          {"from": "21:15", "to": "21:55", "where": "drawing room, taking coffee", "witnesses": ["Lady Vivian", "Colonel Ashby"]},
+          {"from": "21:55", "to": "23:25", "where": "his room in the guest wing, reading", "witnesses": []}
+        ]
+      },
+      "ashby": {
+        "name": "Colonel Rupert Ashby",
+        "role": "old army friend, house guest",
+        "timeline": [
+          {"from": "19:30", "to": "21:15", "where": "dining room, at dinner", "witnesses": ["everyone at dinner"]},
+          {"from": "21:15", "to": "21:55", "where": "drawing room, taking coffee", "witnesses": ["Lady Vivian", "Dr. Finch"]},
+          {"from": "22:00", "to": "23:25", "where": "conservatory, playing bezique", "witnesses": ["Lady Vivian", "Albert Hargreaves (brought tea at 22:30)"]}
+        ]
+      },
+      "hargreaves": {
+        "name": "Albert Hargreaves",
+        "role": "butler",
+        "timeline": [
+          {"from": "19:30", "to": "21:15", "where": "dining room, serving dinner", "witnesses": ["everyone at dinner"]},
+          {"from": "21:15", "to": "22:10", "where": "pantry and kitchen", "witnesses": ["Mrs. Pike"]},
+          {"from": "22:10", "to": "22:20", "where": "pantry, then the library to deliver the decanter", "witnesses": ["Mrs. Pike (saw him fill it)", "Lord Blackwood"]},
+          {"from": "22:20", "to": "22:30", "where": "pantry, polishing silver", "witnesses": ["Mrs. Pike"]},
+          {"from": "22:30", "to": "22:40", "where": "taking tea to the conservatory", "witnesses": ["Lady Vivian", "Colonel Ashby"]},
+          {"from": "22:40", "to": "23:20", "where": "pantry, polishing silver", "witnesses": ["Mrs. Pike"]}
+        ]
+      }
+    }
+kind: ConfigMap
+metadata:
+  name: case-files

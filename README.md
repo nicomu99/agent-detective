@@ -91,7 +91,13 @@ The case files are not baked into the image, so the campaign can be changed with
 the cluster will read them from a ConfigMap:
 
 ```bash
-kubectl create configmap case-files --from-file case_files/
+kubectl apply -f k8s/config_map.yaml
+```
+
+If the config map is not available, run
+
+```bash
+kubectl create configmap case_files --dry-run=client --from-file case_files/ -o yaml > k8s/config_map.yaml
 ```
 
 By default, the application runs in the cluster using the `claude` mode. This requires an API key, which is read form
@@ -104,7 +110,7 @@ kubectl create secret generic anthropic --from-env-file=.env
 Then apply the deployment. A docker image has already been created.
 
 ```bash
-kubectl apply -f deploy.yaml
+kubectl apply -f k8s/deploy.yaml
 ```
 
 Use port-forwaring to talk to the system from your local machine: 
@@ -114,7 +120,7 @@ kubectl port-forward deployments/agent-detective 8080:8080
 ```
 
 If you want to play the game locally, without using an LLM, manually delete the `ANTHROPIC_API_KEY` and
-`DETECTIVE_MODEL` environment variables from `deploy.yaml` and skip creating a Secret.
+`DETECTIVE_MODEL` environment variables from `k8s` and skip creating a Secret.
 
 ## Using the API with curl
 
@@ -185,5 +191,5 @@ Still to do:
 - [x] `Dockerfile` with a multi-stage build using uv (`uv sync --frozen --no-dev`), running as a non-root user, started with `uvicorn app.main:app --host 0.0.0.0 --port 8000`
 - [x] `.dockerignore` (`.venv`, `__pycache__`, `.git`)
 - [x] Decide whether the case files are baked into the image or mounted as a volume, with `CASE_DIR` pointing at them
-- [ ] Kubernetes manifests: `Deployment`, `Service`, `ConfigMap`, `Secret`
+- [x] Kubernetes manifests: `Deployment`, `Service`, `ConfigMap`, `Secret`
 - [ ] Replace the in-memory `InvestigationStore` with Redis, because with more than one replica the next request can hit a pod that has never seen the investigation
