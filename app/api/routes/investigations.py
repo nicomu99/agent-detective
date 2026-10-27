@@ -28,7 +28,7 @@ router = APIRouter()
     response_model=CreateInvestigationResponse,
     status_code=status.HTTP_201_CREATED,
 )
-def create_investigation(
+async def create_investigation(
     inv_store: Annotated[InvestigationStore, Depends(get_store)],
     case_file: Annotated[CaseFile, Depends(get_case_file)],
     settings: Annotated[Settings, Depends(get_settings)],
@@ -44,7 +44,7 @@ def create_investigation(
         The new investigation's id and the case briefing. Status 201.
     """
     new_inv = Investigation(case_file=case_file, max_turns=settings.max_turns)
-    inv_id = inv_store.add(new_inv)
+    inv_id = await inv_store.add(new_inv)
     response = CreateInvestigationResponse(
         investigation_id=inv_id,
         briefing=BRIEFING
@@ -53,7 +53,7 @@ def create_investigation(
 
 
 @router.get("/investigations/{investigation_id}", response_model=InvestigationResponse)
-def get_investigation(
+async def get_investigation(
     investigation_id: str,
     investigation: Annotated[Investigation, Depends(find_investigation)]
 ) -> InvestigationResponse:
@@ -77,7 +77,7 @@ def get_investigation(
 
 
 @router.delete("/investigations/{inv_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_investigation(
+async def delete_investigation(
     inv_id: str,
     inv_store: Annotated[InvestigationStore, Depends(get_store)]
 ):
@@ -93,7 +93,7 @@ def delete_investigation(
     Raises:
         HTTPException: 404 if no investigation has this id.
     """
-    deleted = inv_store.delete(inv_id)
+    deleted = await inv_store.delete(inv_id)
     if not deleted:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"No investigation with id {inv_id} found.")
     return None

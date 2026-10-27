@@ -510,3 +510,36 @@ class Investigation:
         log = []
         self.messages.append(self._handle_tool_use(self.messages[-1]["content"], approved, log))
         return self._agent_loop(model, log)
+
+    @classmethod
+    def from_dict(cls, data: dict, case_file: CaseFile):
+        """Creates an Investigation object from a dict.
+
+        Args:
+            data: Data dictionary containing investigation state.
+            case_file: The evidence the tools work on.
+
+        Returns:
+            An Investigation object built from the dictionary data.
+        """
+        inv = cls(case_file, max_turns=data["max_turns"])
+        inv.messages = data["messages"]
+        inv.pending = data["pending"]
+        inv.verdict = data["verdict"]
+        inv.accused = data["accused"]
+        return inv
+
+    def to_dict(self):
+        """Returns the per-player state as a JSON-serializable dict.
+
+        Returns:
+            A JSON-serializable dict of the investigation state.
+        """
+        inv = {
+            "max_turns": self.max_turns,
+            "messages": self.messages,
+            "pending": self.pending,
+            "verdict": self.verdict,
+            "accused": self.accused
+        }
+        return inv

@@ -6,6 +6,7 @@ import os
 import logging
 from contextlib import asynccontextmanager
 
+import redis.asyncio as redis
 from fastapi import FastAPI
 
 from app.core import setup_logging, request_id, load_settings
@@ -17,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
-async def lifespan(app_: FastAPI):
+async def lifespan(app: FastAPI):
     """Loads everything the service needs before it accepts requests.
 
     Code before ``yield`` runs once at startup and code after it at shutdown
@@ -25,7 +26,7 @@ async def lifespan(app_: FastAPI):
     the ``get_*`` dependencies read them.
 
     Args:
-        app_: The FastAPI application being started.
+        app: The FastAPI application being started.
 
     Yields:
         Nothing. Control returns to FastAPI, which serves requests until
@@ -38,21 +39,28 @@ async def lifespan(app_: FastAPI):
         instead of serving requests.
     """
     settings = load_settings()
-    app_.state.settings = settings
-    app_.state.case_file = CaseFile.load(settings.case_dir)
-    app_.state.investigations = InvestigationStore()
-    logger.info("Loaded %d case files from %s", len(app_.state.case_file.index.documents), settings.case_dir)
+    app.state.settings = settings
+    app.state.case_file = CaseFile.load(settings.case_dir)
+    app.state.redis = redis.Redis.from_url(settings.redis_url, decode_responses=True)
+    app.state.investigations = InvestigationStore(app.state.redis, app.state.case_file)
+    logger.info("Loaded %d case files from %s", len(app.state.case_file.index.documents), settings.case_dir)
     yield
+    await app.state.redis.aclose()
 
 
 def create_app() -> FastAPI:
+    """Main entry point of the application.
+
+    Returns:
+        The FastAPI application.
+    """
     setup_logging(os.environ.get("LOG_LEVEL", "INFO"))
-    app_ = FastAPI(title="Blackwood Manor", version="1.0", lifespan=lifespan)
-    app_.middleware("http")(request_id)
-    app_.include_router(health.router)
-    app_.include_router(evidence.router)
-    app_.include_router(investigations.router)
-    return app_
+    app = FastAPI(title="Blackwood Manor", version="1.0", lifespan=lifespan)
+    app.middleware("http")(request_id)
+    app.include_router(health.router)
+    app.include_router(evidence.router)
+    app.include_router(investigations.router)
+    return app
 
 
-app = create_app()
+main_app = create_app()

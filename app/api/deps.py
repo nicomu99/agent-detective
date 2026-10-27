@@ -60,7 +60,7 @@ def get_store(request: Request) -> InvestigationStore:
     return request.app.state.investigations
 
 
-def find_investigation(
+async def find_investigation(
     investigation_id: str,
     inv_store: Annotated[InvestigationStore, Depends(get_store)]
 ) -> Investigation:
@@ -81,7 +81,7 @@ def find_investigation(
     Raises:
         HTTPException: 404 if no investigation has this id.
     """
-    inv = inv_store.get(investigation_id)
+    inv = await inv_store.get(investigation_id)
     if inv is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

@@ -1,7 +1,8 @@
 """Investigation store."""
 import uuid
+import redis.asyncio as redis
 
-from app.domain import Investigation
+from app.domain import Investigation, CaseFile
 
 
 class InvestigationStore:
@@ -12,11 +13,13 @@ class InvestigationStore:
     store such as Redis.
     """
 
-    def __init__(self):
+    def __init__(self, r: redis.Redis, case_file: CaseFile):
         """Creates an empty store."""
-        self._items: dict[str, Investigation] = {}
+        self._r = r
+        self._case_file = case_file
+        # self._items: dict[str, Investigation] = {}
 
-    def add(self, investigation: Investigation) -> str:
+    async def add(self, investigation: Investigation) -> str:
         """Stores an investigation under a new random id.
 
         Args:
@@ -26,10 +29,10 @@ class InvestigationStore:
             The new id, 12 hex characters.
         """
         investigation_id = uuid.uuid4().hex[:12]
-        self._items[investigation_id] = investigation
+        await self._r.set(f"investigation:{investigation_id}", investigation.to_dict())
         return investigation_id
 
-    def get(self, investigation_id: str) -> Investigation | None:
+    async def get(self, investigation_id: str) -> Investigation | None:
         """Looks up an investigation by id.
 
         Args:
@@ -38,9 +41,10 @@ class InvestigationStore:
         Returns:
             The investigation, or None if the id is unknown.
         """
-        return self._items.get(investigation_id)
+        raw = await self._r.get(f"investigation:{investigation_id}")
+        return Investigation.from_dict(raw, self._case_file) if raw else None
 
-    def delete(self, investigation_id: str) -> bool:
+    async def delete(self, investigation_id: str) -> bool:
         """Removes an investigation.
 
         Args:
@@ -49,4 +53,5 @@ class InvestigationStore:
         Returns:
             True if it existed and was removed, False if the id was unknown.
         """
-        return self._items.pop(investigation_id, None) is not None
+        deleted_keys = await self._r.delete(f"investigation:{investigation_id}")
+        return bool(deleted_keys)
