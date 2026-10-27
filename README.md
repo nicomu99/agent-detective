@@ -64,7 +64,7 @@ Invalid values make the service **refuse to start**, so a misconfigured containe
 ## Running locally
 
 ```bash
-uv run uvicorn app.main:app --reload
+uv run uvicorn app.main:main_app --reload
 ```
 
 Then open http://127.0.0.1:8000/docs for the interactive API docs. To play with the real agent:
@@ -75,7 +75,28 @@ DETECTIVE_MODEL=claude ANTHROPIC_API_KEY=sk-ant-... uv run uvicorn app.main:app 
 
 Run the tests with `uv run pytest`.
 
-## Running with K8s
+## Running with K8s and Docker
+
+(optionally) Build a docker image
+
+```bash
+docker build -t <image-name>:<image-version> .
+```
+
+and push it to your docker hub.
+
+```bash
+docker push <image-name>:<image-version>
+```
+
+A pre-built image is also publicly available.
+
+Then deploy the Redis Deployment and expose it via a Service:
+
+```bash
+kubectl apply -f k8s/redis_deploy.yaml
+kubectl apply -f k8s/redis_service.yaml
+```
 
 The case files are not baked into the image, so the campaign can be changed without needing to update it. Instead,
 the cluster will read them from a ConfigMap:
@@ -173,9 +194,3 @@ Every response carries an `X-Request-ID` header. Send your own (`-H "X-Request-I
 | `409` | Action not allowed right now (asking while an accusation awaits approval, approving when nothing is pending, or the case is closed) |
 | `422` | Invalid request (empty text, `k` out of range, `approved` not a boolean)                                                            |
 | `503` | `/ready` before startup has finished                                                                                                |
-
-## Roadmap: Docker and Kubernetes
-
-Still to do:
-
-- [ ] Replace the in-memory `InvestigationStore` with Redis, because with more than one replica the next request can hit a pod that has never seen the investigation

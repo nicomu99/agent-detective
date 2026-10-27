@@ -20,7 +20,7 @@ spec:
         configMap:
           name: case-files
       containers:
-      - image: muellern99/agent-detective:0.0.1
+      - image: muellern99/agent-detective:0.2.0
         name: agent-detective
         imagePullPolicy: IfNotPresent
         volumeMounts:
@@ -36,6 +36,8 @@ spec:
               key: ANTHROPIC_API_KEY
         - name: DETECTIVE_MODEL
           value: claude
+        - name: REDIS_URL
+          value: redis://redis:6379/0
         ports:
         - containerPort: 8080
           name: app-port

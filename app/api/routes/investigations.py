@@ -1,6 +1,7 @@
 """Investigation routes."""
 from typing import Annotated, Callable
 
+import asyncio
 import logging
 
 from fastapi import APIRouter, status, Depends, HTTPException
@@ -100,9 +101,10 @@ async def delete_investigation(
 
 
 @router.post("/investigations/{investigation_id}/messages", response_model=TurnResponse)
-def ask(
+async def ask(
     investigation_id: str,
     investigation: Annotated[Investigation, Depends(find_investigation)],
+    inv_store: Annotated[InvestigationStore, Depends(get_store)],
     body: InvestigationBody,
     model: Annotated[Callable, Depends(get_model)],
 ) -> TurnResponse:
@@ -112,6 +114,7 @@ def ask(
         investigation_id: The id from the URL path. Used for logging; the
             lookup itself happens in ``find_investigation``.
         investigation: The matching investigation (injected, 404 if unknown).
+        inv_store: The investigation store (injected).
         body: The request body with the inspector's ``text``.
         model: The model to use (injected).
 
@@ -128,15 +131,18 @@ def ask(
     if len(body.text) == 0:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=f"Request contains empty body.")
     try:
-        return TurnResponse.model_validate(investigation.ask(body.text, model))
+        turn = await asyncio.to_thread(investigation.ask, body.text, model)
     except InvestigationError as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
+    await inv_store.save(investigation_id, investigation)
+    return TurnResponse.model_validate(turn)
 
 
 @router.post("/investigations/{investigation_id}/approval", response_model=TurnResponse)
-def decide(
+async def decide(
     investigation_id: str,
     investigation: Annotated[Investigation, Depends(find_investigation)],
+    inv_store: Annotated[InvestigationStore, Depends(get_store)],
     body: InvestigationApprovalBody,
     model: Annotated[Callable, Depends(get_model)],
 ) -> TurnResponse:
@@ -150,6 +156,7 @@ def decide(
         investigation_id: The id from the URL path. Used for logging; the
             lookup itself happens in ``find_investigation``.
         investigation: The matching investigation (injected, 404 if unknown).
+        inv_store: The investigation store (injected).
         body: The request body with ``approved`` (bool).
         model: The model to use (injected).
 
@@ -163,6 +170,8 @@ def decide(
     """
     logger.info("decision for investigation %s", investigation_id)
     try:
-        return TurnResponse.model_validate(investigation.decide(body.approved, model))
+        turn = await asyncio.to_thread(investigation.decide, body.approved, model)
     except InvestigationError as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
+    await inv_store.save(investigation_id, investigation)
+    return TurnResponse.model_validate(turn)
