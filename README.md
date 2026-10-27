@@ -14,15 +14,6 @@ A small FastAPI microservice where you play the inspector. You chat with **Serge
 
 The model is pluggable: `fake` (default, a tiny command parser, so no API key is needed) or `claude` (the real agent via the Anthropic API).
 
-```
- client ──► FastAPI routes ──► InvestigationService ──► Investigation (agent loop) ──► model (fake | Claude)
-                │                      │                        │
-                │                      ▼                        ▼ tools
-                │               InvestigationStore        EvidenceIndex (RAG) ◄── case_files/
-                ▼
-         /evidence/* ──────────────────────────────────────────►┘
-```
-
 ## Project structure
 
 ```
@@ -38,7 +29,6 @@ app/
 ├── repositories/        # InvestigationStore (in memory)
 └── domain/              # evidence.py (RAG), detective.py (agent), llm.py (models)
 case_files/              # the evidence: *.md statements and reports, suspects.json
-tests/
 ```
 
 Dependencies point inward: routes call services, and services call the repository and domain. Only `app/api` and `app/main.py` know about FastAPI.
@@ -188,8 +178,4 @@ Every response carries an `X-Request-ID` header. Send your own (`-H "X-Request-I
 
 Still to do:
 
-- [x] `Dockerfile` with a multi-stage build using uv (`uv sync --frozen --no-dev`), running as a non-root user, started with `uvicorn app.main:app --host 0.0.0.0 --port 8000`
-- [x] `.dockerignore` (`.venv`, `__pycache__`, `.git`)
-- [x] Decide whether the case files are baked into the image or mounted as a volume, with `CASE_DIR` pointing at them
-- [x] Kubernetes manifests: `Deployment`, `Service`, `ConfigMap`, `Secret`
 - [ ] Replace the in-memory `InvestigationStore` with Redis, because with more than one replica the next request can hit a pod that has never seen the investigation

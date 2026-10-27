@@ -38,4 +38,23 @@ spec:
           value: claude
         ports:
         - containerPort: 8080
+          name: app-port
         resources: {}
+        startupProbe:
+          httpGet:
+            path: /ready
+            port: app-port
+          failureThreshold: 30
+          periodSeconds: 5
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: app-port
+          periodSeconds: 5
+          failureThreshold: 1
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: app-port
+          periodSeconds: 5
+          failureThreshold: 1
