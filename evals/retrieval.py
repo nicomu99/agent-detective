@@ -1,17 +1,37 @@
-"""Step 12: retrieval evals. Does the evidence index find the right case files?
-
-The index returns chunks (paragraphs), so `retrieved` is a list of doc_ids in rank order and can
-contain the same doc_id twice, e.g. ["butler-statement", "coroner-report", "butler-statement"].
-"""
+"""Retrieval evals."""
 
 
 def recall_at_k(retrieved: list[str], relevant: list[str], k: int) -> float:
+    """Computes the retrieval recall for a given k.
+
+    For a single evaluation instance, computes the recall of how many relevant sources were actually found by the
+    RAG system.
+
+    Args:
+        retrieved: A list of case file identifiers the RAG system returned for some query, ordered by relevancy.
+        relevant: The relevant case files for some query.
+        k: The number of sources the RAG system should retrieve.
+
+    Returns:
+        The recall at k for a single evaluation instance.
+    """
     top_k = set(retrieved[:k])
     count = sum(1 for r in relevant if r in top_k)
     return count / len(relevant)
 
 
 def reciprocal_rank(retrieved: list[str], relevant: list[str]) -> float:
+    """Computes the reciprocal rank of the most relevant retrieved source.
+
+    Computes the reciprocal rank 1 / rank of the most relevant source from retrieved.
+
+    Args:
+        retrieved: A list of case file identifiers a RAG system returned for some query, ordered by relevancy.
+        relevant: List of relevant case files for some query.
+
+    Returns:
+        The reciprocal rank of the most relevant retrieved source or 0.0 if no retrieved source is relevant.
+    """
     for idx, r in enumerate(retrieved):
         if r in relevant:
             return 1 / float(idx + 1)
@@ -19,6 +39,21 @@ def reciprocal_rank(retrieved: list[str], relevant: list[str]) -> float:
 
 
 def evaluate_retrieval(index, cases: list[dict], k: int = 3) -> dict:
+    """Evaluates the retrieval performance.
+
+    Calculates the mean recall at k and mean reciprocal rank for all evaluation cases. A case with no relevant docs
+    is skipped.
+
+    Args:
+        index: Search index that is used to retrieve relevant docs.
+        cases: A list of evaluation instances. The instances mut contain at least the keys `question` and
+            `relevant_docs` to be evaluated.
+        k: The number of retrieved documents.
+
+    Returns:
+        A dictionary containing the mean recall, mean reciprocal rank and number of cases where no relevant sources
+        were found.
+    """
     recall, r_rank, total = 0.0, 0.0, 0
     misses = []
     for case in cases:
