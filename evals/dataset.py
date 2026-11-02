@@ -1,0 +1,59 @@
+"""Step 11: the golden dataset.
+
+evals/data/golden.jsonl holds one test case per line. A case looks like this:
+
+    {"id": "time-of-death",
+     "category": "fact",                       # one of CATEGORIES
+     "question": "When did Lord Blackwood die, according to the coroner?",
+     "relevant_docs": ["coroner-report"],      # case files a good answer needs ([] if none)
+     "must_include": [["22:30"], ["23:00"]],   # every group must match; any phrase in a group will do
+     "must_not_include": [],                   # phrases a correct answer never contains
+     "reference_answer": "Between 22:30 and 23:00, from digitalis poisoning (coroner-report).",
+                                               # what a human would accept, for the judge (null: don't judge)
+     "agent": {"useful_tools": ["search_evidence", "read_document"],   # at least one should be used
+               "may_accuse": false}}           # is proposing an accusation acceptable here?
+"""
+
+import json
+from json import JSONDecodeError
+from pathlib import Path
+
+CATEGORIES = {"fact", "alibi", "contradiction", "unanswerable", "accusation"}
+REQUIRED = {"id", "category", "question", "relevant_docs", "must_include", "must_not_include",
+            "reference_answer", "agent"}
+
+
+class DatasetError(ValueError):
+    """A golden case is malformed. The message should say which case and what is wrong."""
+
+
+def load_golden(path: Path, known_docs: set[str]) -> list[dict]:
+    data = []
+    seen_ids = set()
+    with path.open(encoding="utf-8") as f:
+        for idx, line in enumerate(f):
+            try:
+                raw = json.loads(line)
+            except JSONDecodeError as _:
+                raise DatasetError(f"Line {idx} could not be read. Entry is not valid JSON format.")
+            missing = REQUIRED - set(raw)
+            if missing:
+                raise DatasetError(f"Case on line {idx} is missing required columns. Missing: {missing}")
+            case_id = raw["id"]
+            if case_id in seen_ids:
+                raise DatasetError(f"Duplicate case id {case_id}. Case ids must be unique.")
+            seen_ids.add(case_id)
+            if raw["category"] not in CATEGORIES:
+                raise DatasetError(f"Case {case_id} contains unknown category {raw["category"]}.")
+            docs = set(raw["relevant_docs"]) - known_docs
+            if docs:
+                raise DatasetError(f"Case {case_id} contains unknown docs {docs}.")
+            if not all(isinstance(m, list) and (isinstance(s, str) for s in m) for m in raw["must_include"]):
+                raise DatasetError(f"Case {case_id} contains invalid must_include. Must be list of list of strings.")
+            if raw["category"] == "unanswerable" and len(raw["relevant_docs"]) > 0:
+                raise DatasetError(f"Case {case_id} has category 'unanswerable', while listing relevant docs.")
+            agent = raw["agent"]
+            if not isinstance(agent.get("useful_tools"), list) or not isinstance(agent.get("may_accuse"), bool):
+                raise DatasetError(f"Case {case_id} does not mention useful tools or may accuse for agent.")
+            data.append(raw)
+    return data
