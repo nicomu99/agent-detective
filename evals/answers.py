@@ -43,4 +43,4 @@ def code_checks(case: dict, answer: str | None) -> dict:
         cites = True
     else:
         cites = any(mentions(answer, d) for d in docs)
-    return {"includes": includes, "excludes": excludes, "cites": cites, "passed": includes and docs and excludes}
+    return {"includes": includes, "excludes": excludes, "cites": cites, "passed": includes and cites and excludes}
