@@ -1,4 +1,5 @@
 """Schema module."""
+
 from .evidence import DocumentResponse, SearchHit, SearchResponse
 from .investigations import (
     CreateInvestigationResponse,

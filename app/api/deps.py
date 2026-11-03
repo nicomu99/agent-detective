@@ -1,4 +1,5 @@
 """FastAPI dependencies."""
+
 from typing import Annotated
 
 from fastapi import Depends, HTTPException, Request, status
@@ -60,8 +61,7 @@ def get_store(request: Request) -> InvestigationStore:
 
 
 async def find_investigation(
-    investigation_id: str,
-    inv_store: Annotated[InvestigationStore, Depends(get_store)]
+    investigation_id: str, inv_store: Annotated[InvestigationStore, Depends(get_store)]
 ) -> Investigation:
     """FastAPI dependency that looks up the investigation named in the URL.
 
@@ -84,7 +84,7 @@ async def find_investigation(
     if inv is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"No investigation with id {investigation_id} found."
+            detail=f"No investigation with id {investigation_id} found.",
         )
     return inv
 

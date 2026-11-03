@@ -1,4 +1,5 @@
 """Logging utilities."""
+
 import logging
 
 
@@ -9,6 +10,5 @@ def setup_logging(level: str = "INFO") -> None:
         level: The logging level. Defaults to "INFO".
     """
     logging.basicConfig(
-        level=level,
-        format="%(asctime)s %(levelname)s %(name)s: %(message)s"
+        level=level, format="%(asctime)s %(levelname)s %(name)s: %(message)s"
     )

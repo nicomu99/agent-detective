@@ -82,11 +82,15 @@ def parse_verdict(text: str) -> dict:
 
     verdict = str(data.get("verdict", "")).strip().lower()
     if verdict not in ("pass", "fail"):
-        raise JudgeParseError(f"verdict must be 'pass' or 'fail', got {data.get('verdict')!r}")
+        raise JudgeParseError(
+            f"verdict must be 'pass' or 'fail', got {data.get('verdict')!r}"
+        )
     return {"verdict": verdict, "reason": str(data.get("reason", ""))}
 
 
-def judge_answer(case: dict, answer: str | None, evidence: list[dict], judge, retries: int = 1) -> dict:
+def judge_answer(
+    case: dict, answer: str | None, evidence: list[dict], judge, retries: int = 1
+) -> dict:
     """Asks the judge to grade one answer, retrying when its reply can't be parsed.
 
     Args:
@@ -100,7 +104,9 @@ def judge_answer(case: dict, answer: str | None, evidence: list[dict], judge, re
         ``{"verdict": "pass" | "fail", "reason": str}``, or ``{"verdict": "error", "reason": ...}``
         if no reply could be parsed, so one bad reply doesn't crash a whole eval run.
     """
-    prompt = build_judge_prompt(case, answer if answer is not None else "(no answer)", evidence)
+    prompt = build_judge_prompt(
+        case, answer if answer is not None else "(no answer)", evidence
+    )
     error = None
     for _ in range(retries + 1):
         try:

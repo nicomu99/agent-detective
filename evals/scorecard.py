@@ -139,19 +139,26 @@ def compare(baseline: dict, current: dict, tolerance: float = 0.02) -> list[str]
             ret.append(f"metric {metric_key} is missing for new model")
             continue
         current_val = current[metric_key]
-        if (
-                (metric_key in LOWER_IS_BETTER and current_val - base_val > tolerance) or
-                (metric_key not in LOWER_IS_BETTER and base_val - current_val > tolerance)
+        if (metric_key in LOWER_IS_BETTER and current_val - base_val > tolerance) or (
+            metric_key not in LOWER_IS_BETTER and base_val - current_val > tolerance
         ):
             ret.append(f"{metric_key}: {base_val:.3f} -> {current_val:.3f}")
     return ret
 
 
 def main(argv=None) -> int:
-    parser = argparse.ArgumentParser(description="Score a recorded run and compare it with a baseline.")
+    parser = argparse.ArgumentParser(
+        description="Score a recorded run and compare it with a baseline."
+    )
     parser.add_argument("run", type=Path)
-    parser.add_argument("--baseline", type=Path, help="fail (exit code 1) if any metric got worse than this")
-    parser.add_argument("--save", type=Path, help="write the scorecard here, e.g. as the new baseline")
+    parser.add_argument(
+        "--baseline",
+        type=Path,
+        help="fail (exit code 1) if any metric got worse than this",
+    )
+    parser.add_argument(
+        "--save", type=Path, help="write the scorecard here, e.g. as the new baseline"
+    )
     parser.add_argument("--judge", choices=["fake", "claude"], default="fake")
     parser.add_argument("--k", type=int, default=3)
     args = parser.parse_args(argv)
@@ -159,7 +166,9 @@ def main(argv=None) -> int:
     case_file = CaseFile.load(CASE_DIR)
     cases = load_golden(GOLDEN, {d["doc_id"] for d in case_file.index.documents})
     judge = claude_judge if args.judge == "claude" else FakeJudge(seed=0)
-    scores = build_scorecard(cases, load_run(args.run), case_file.index, judge, k=args.k)
+    scores = build_scorecard(
+        cases, load_run(args.run), case_file.index, judge, k=args.k
+    )
     baseline = json.loads(args.baseline.read_text()) if args.baseline else {}
 
     print(f"Scorecard for {args.run} ({len(cases)} golden cases)\n")

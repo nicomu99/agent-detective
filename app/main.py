@@ -1,7 +1,8 @@
 """Part 3: the Blackwood Manor detective service, built with FastAPI.
 
-    uvicorn app.main:app --reload      then open http://127.0.0.1:8000/docs
+uvicorn app.main:app --reload      then open http://127.0.0.1:8000/docs
 """
+
 import logging
 import os
 from contextlib import asynccontextmanager
@@ -43,7 +44,11 @@ async def lifespan(app: FastAPI):
     app.state.case_file = CaseFile.load(settings.case_dir)
     app.state.redis = redis.Redis.from_url(settings.redis_url, decode_responses=True)
     app.state.investigations = InvestigationStore(app.state.redis, app.state.case_file)
-    logger.info("Loaded %d case files from %s", len(app.state.case_file.index.documents), settings.case_dir)
+    logger.info(
+        "Loaded %d case files from %s",
+        len(app.state.case_file.index.documents),
+        settings.case_dir,
+    )
     yield
     await app.state.redis.aclose()
 

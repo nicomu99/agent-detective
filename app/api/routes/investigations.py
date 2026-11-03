@@ -1,4 +1,5 @@
 """Investigation routes."""
+
 import asyncio
 import logging
 from collections.abc import Callable
@@ -52,17 +53,14 @@ async def create_investigation(
     """
     new_inv = Investigation(case_file=case_file, max_turns=settings.max_turns)
     inv_id = await inv_store.add(new_inv)
-    response = CreateInvestigationResponse(
-        investigation_id=inv_id,
-        briefing=BRIEFING
-    )
+    response = CreateInvestigationResponse(investigation_id=inv_id, briefing=BRIEFING)
     return response
 
 
 @router.get("/investigations/{investigation_id}", response_model=InvestigationResponse)
 async def get_investigation(
     investigation_id: str,
-    investigation: Annotated[Investigation, Depends(find_investigation)]
+    investigation: Annotated[Investigation, Depends(find_investigation)],
 ) -> InvestigationResponse:
     """Returns the current state of an investigation.
 
@@ -73,7 +71,9 @@ async def get_investigation(
     Returns:
         Status, number of questions asked and who was accused.
     """
-    query_count = sum(1 for m in investigation.messages if isinstance(m["content"], str))
+    query_count = sum(
+        1 for m in investigation.messages if isinstance(m["content"], str)
+    )
     inv_response = InvestigationResponse(
         investigation_id=investigation_id,
         status=investigation.status,
@@ -85,8 +85,7 @@ async def get_investigation(
 
 @router.delete("/investigations/{inv_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_investigation(
-    inv_id: str,
-    inv_store: Annotated[InvestigationStore, Depends(get_store)]
+    inv_id: str, inv_store: Annotated[InvestigationStore, Depends(get_store)]
 ):
     """Closes an investigation and forgets it.
 
@@ -102,7 +101,10 @@ async def delete_investigation(
     """
     deleted = await inv_store.delete(inv_id)
     if not deleted:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"No investigation with id {inv_id} found.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No investigation with id {inv_id} found.",
+        )
 
 
 @router.post("/investigations/{investigation_id}/messages", response_model=TurnResponse)
@@ -134,7 +136,10 @@ async def ask(
     """
     logger.info("question for investigation %s", investigation_id)
     if len(body.text) == 0:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Request contains empty body.")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail="Request contains empty body.",
+        )
     try:
         turn = await asyncio.to_thread(investigation.ask, body.text, model)
     except InvestigationError as e:

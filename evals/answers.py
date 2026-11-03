@@ -4,6 +4,7 @@ Each golden case contains a list of phrases an answer by the agent should have, 
 that contain the information we are searching for. This module checks whether this information is present
 (or not present).
 """
+
 import re
 
 
@@ -17,7 +18,9 @@ def mentions(text: str, phrase: str) -> bool:
     Returns:
         True if the given phrase could be found in the text, else False.
     """
-    return bool(re.compile(rf'\b({phrase.lower()})\b', flags=re.IGNORECASE).search(text.lower()))
+    return bool(
+        re.compile(rf"\b({phrase.lower()})\b", flags=re.IGNORECASE).search(text.lower())
+    )
 
 
 def code_checks(case: dict, answer: str | None) -> dict:
@@ -46,4 +49,9 @@ def code_checks(case: dict, answer: str | None) -> dict:
         cites = True
     else:
         cites = any(mentions(answer, d) for d in docs)
-    return {"includes": includes, "excludes": excludes, "cites": cites, "passed": includes and cites and excludes}
+    return {
+        "includes": includes,
+        "excludes": excludes,
+        "cites": cites,
+        "passed": includes and cites and excludes,
+    }

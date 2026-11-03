@@ -1,4 +1,5 @@
 """Investigation store."""
+
 import json
 import uuid
 
@@ -30,7 +31,9 @@ class InvestigationStore:
             The new id, 12 hex characters.
         """
         investigation_id = uuid.uuid4().hex[:12]
-        await self._r.set(self._key(investigation_id), json.dumps(investigation.to_dict()))
+        await self._r.set(
+            self._key(investigation_id), json.dumps(investigation.to_dict())
+        )
         return investigation_id
 
     async def get(self, investigation_id: str) -> Investigation | None:
@@ -43,7 +46,9 @@ class InvestigationStore:
             The investigation, or None if the id is unknown.
         """
         raw = await self._r.get(self._key(investigation_id))
-        return Investigation.from_dict(json.loads(raw), self._case_file) if raw else None
+        return (
+            Investigation.from_dict(json.loads(raw), self._case_file) if raw else None
+        )
 
     async def save(self, investigation_id: str, investigation: Investigation) -> None:
         """Store an investigation into the Redis store.
@@ -52,7 +57,9 @@ class InvestigationStore:
             investigation_id: Unique identifier of the investigation to store.
             investigation: Investigation data.
         """
-        await self._r.set(self._key(investigation_id), json.dumps(investigation.to_dict()))
+        await self._r.set(
+            self._key(investigation_id), json.dumps(investigation.to_dict())
+        )
 
     async def delete(self, investigation_id: str) -> bool:
         """Removes an investigation.

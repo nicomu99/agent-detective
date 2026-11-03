@@ -1,8 +1,8 @@
 """The RAG part: search over the case files.
 
-    index = EvidenceIndex.from_dir(Path("case_files"))
-    index.search("brandy decanter", k=3)   # -> [{"doc_id", "title", "snippet", "score"}, ...]
-    index.get("coroner-report")            # -> {"doc_id", "title", "text"} or None
+index = EvidenceIndex.from_dir(Path("case_files"))
+index.search("brandy decanter", k=3)   # -> [{"doc_id", "title", "snippet", "score"}, ...]
+index.get("coroner-report")            # -> {"doc_id", "title", "text"} or None
 """
 
 import re
@@ -11,10 +11,61 @@ from pathlib import Path
 
 import numpy as np
 
-STOPWORDS = {"a", "an", "and", "are", "as", "at", "be", "by", "did", "do", "does", "for", "from", "had", "has", "have",
-             "he", "her", "his", "how", "i", "if", "in", "is", "it", "its", "me", "my", "of", "on", "or", "she", "so",
-             "that", "the", "their", "them", "there", "they", "this", "to", "was", "we", "were", "what", "when",
-             "where", "which", "who", "will", "with", "you", "your"}
+STOPWORDS = {
+    "a",
+    "an",
+    "and",
+    "are",
+    "as",
+    "at",
+    "be",
+    "by",
+    "did",
+    "do",
+    "does",
+    "for",
+    "from",
+    "had",
+    "has",
+    "have",
+    "he",
+    "her",
+    "his",
+    "how",
+    "i",
+    "if",
+    "in",
+    "is",
+    "it",
+    "its",
+    "me",
+    "my",
+    "of",
+    "on",
+    "or",
+    "she",
+    "so",
+    "that",
+    "the",
+    "their",
+    "them",
+    "there",
+    "they",
+    "this",
+    "to",
+    "was",
+    "we",
+    "were",
+    "what",
+    "when",
+    "where",
+    "which",
+    "who",
+    "will",
+    "with",
+    "you",
+    "your",
+}
 
 
 def tokenize(text: str) -> list[str]:
@@ -35,6 +86,7 @@ def tokenize(text: str) -> list[str]:
 
 class EvidenceIndex:
     """A simple index based on the document "database" that consists of Markdown files."""
+
     def __init__(self, documents: list[dict]):
         self.documents = documents
         self.document_dict = {doc["doc_id"]: doc for doc in documents}
@@ -64,13 +116,15 @@ class EvidenceIndex:
             for idx, paragraph in enumerate(paragraphs):
                 if paragraph.startswith("#"):
                     continue
-                chunk_list.append({
-                    "doc_id": document["doc_id"],
-                    "chunk_id": f"{document["doc_id"]}#{idx}",
-                    "title": document["title"],
-                    "text": paragraph,
-                    "tokens": tokenize(document["title"] + " " + paragraph)
-                })
+                chunk_list.append(
+                    {
+                        "doc_id": document["doc_id"],
+                        "chunk_id": f"{document['doc_id']}#{idx}",
+                        "title": document["title"],
+                        "text": paragraph,
+                        "tokens": tokenize(document["title"] + " " + paragraph),
+                    }
+                )
         return chunk_list
 
     def _prepare_index(self, texts: list[str]):
@@ -128,7 +182,13 @@ class EvidenceIndex:
         for path in sorted(Path(case_dir).glob("*.md")):
             text = path.read_text(encoding="utf-8")
             first_line = text.splitlines()[0] if text else path.stem
-            documents.append({"doc_id": path.stem, "title": first_line.lstrip("# ").strip(), "text": text})
+            documents.append(
+                {
+                    "doc_id": path.stem,
+                    "title": first_line.lstrip("# ").strip(),
+                    "text": text,
+                }
+            )
         if not documents:
             raise FileNotFoundError(f"no case files (*.md) found in {case_dir}")
         return cls(documents)
@@ -155,12 +215,14 @@ class EvidenceIndex:
                 continue
             chunk = self.chunk_list[idx]
 
-            top_k.append({
-                "doc_id": chunk["doc_id"],
-                "title": chunk["title"],
-                "snippet": chunk["text"],
-                "score": score
-            })
+            top_k.append(
+                {
+                    "doc_id": chunk["doc_id"],
+                    "title": chunk["title"],
+                    "snippet": chunk["text"],
+                    "score": score,
+                }
+            )
         return top_k[:k]
 
     def get(self, doc_id: str) -> dict | None:

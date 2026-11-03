@@ -71,7 +71,9 @@ def cohen_kappa(a: list[str], b: list[str]) -> float:
     return kappa
 
 
-def measure_judge(judge, labels: list[dict], cases_by_id: dict, index, repeats: int = 3) -> dict:
+def measure_judge(
+    judge, labels: list[dict], cases_by_id: dict, index, repeats: int = 3
+) -> dict:
     """Runs the judge on human-graded answers and measures how well it agrees with the human.
 
     Each answer is judged ``repeats`` times against its golden case and the case's evidence,
@@ -108,7 +110,11 @@ def measure_judge(judge, labels: list[dict], cases_by_id: dict, index, repeats: 
 
         judgments = []
         for _ in range(repeats):
-            judgments.append(judge_answer(case, label["answer"], evidence=evidence, judge=judge)["verdict"])
+            judgments.append(
+                judge_answer(case, label["answer"], evidence=evidence, judge=judge)[
+                    "verdict"
+                ]
+            )
         if len(set(judgments)) == 1:
             consistency += 1
         verdict = "pass" if judgments.count("pass") > repeats / 2 else "fail"
@@ -130,6 +136,6 @@ def measure_judge(judge, labels: list[dict], cases_by_id: dict, index, repeats: 
         "false_pass_rate": false_pass,
         "false_fail_rate": false_fail,
         "consistency": consistency,
-        "disagreements": disagreement
+        "disagreements": disagreement,
     }
     return out

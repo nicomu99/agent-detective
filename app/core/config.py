@@ -1,4 +1,5 @@
 """Settings configuration. Gets loaded once on startup."""
+
 import os
 from dataclasses import dataclass
 from pathlib import Path
@@ -20,8 +21,9 @@ class Settings:
         max_turns: Maximum model calls per agent turn.
         redis_url: The URL that points to the Redis store.
     """
+
     case_dir: Path
-    model: str      # "fake" or "claude"
+    model: str  # "fake" or "claude"
     max_turns: int
     redis_url: str
 
@@ -50,7 +52,9 @@ def load_settings() -> Settings:
 
     model = os.environ.get("DETECTIVE_MODEL", "fake").strip().lower()
     if model not in ("fake", "claude"):
-        raise ValueError(f"DETECTIVE_MODEL {model} unknown. Must be 'fake' or 'claude'.")
+        raise ValueError(
+            f"DETECTIVE_MODEL {model} unknown. Must be 'fake' or 'claude'."
+        )
     if model == "claude" and not llm.has_api_key():
         raise ValueError("DETECTIVE_MODEL=claude needs ANTHROPIC_API_KEY to be set")
 

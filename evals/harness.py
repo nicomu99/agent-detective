@@ -26,10 +26,61 @@ ROOT = Path(__file__).resolve().parent.parent
 CASE_DIR = ROOT / "case_files"
 DATA = Path(__file__).resolve().parent / "data"
 GOLDEN = DATA / "golden.jsonl"
-STOPWORDS = {"a", "an", "and", "are", "as", "at", "be", "by", "did", "do", "does", "for", "from", "had", "has", "have",
-             "he", "her", "his", "how", "i", "if", "in", "is", "it", "its", "me", "my", "of", "on", "or", "she", "so",
-             "that", "the", "their", "them", "there", "they", "this", "to", "was", "we", "were", "what", "when",
-             "where", "which", "who", "will", "with", "you", "your"}
+STOPWORDS = {
+    "a",
+    "an",
+    "and",
+    "are",
+    "as",
+    "at",
+    "be",
+    "by",
+    "did",
+    "do",
+    "does",
+    "for",
+    "from",
+    "had",
+    "has",
+    "have",
+    "he",
+    "her",
+    "his",
+    "how",
+    "i",
+    "if",
+    "in",
+    "is",
+    "it",
+    "its",
+    "me",
+    "my",
+    "of",
+    "on",
+    "or",
+    "she",
+    "so",
+    "that",
+    "the",
+    "their",
+    "them",
+    "there",
+    "they",
+    "this",
+    "to",
+    "was",
+    "we",
+    "were",
+    "what",
+    "when",
+    "where",
+    "which",
+    "who",
+    "will",
+    "with",
+    "you",
+    "your",
+}
 
 
 def tokenize(text: str) -> list[str]:
@@ -39,7 +90,11 @@ def tokenize(text: str) -> list[str]:
 def load_run(path: Path) -> dict[str, dict]:
     """A recorded run, as {case_id: {"case_id", "question", "answer", "tool_calls", "model_calls", "status",
     "pending"}}."""
-    records = [json.loads(line) for line in Path(path).read_text(encoding="utf-8").splitlines() if line.strip()]
+    records = [
+        json.loads(line)
+        for line in Path(path).read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
     return {r["case_id"]: r for r in records}
 
 
@@ -52,9 +107,12 @@ def evidence_for(index, case: dict) -> list[dict]:
 # Judges
 # ---------------------------------------------------------------------------
 
+
 def claude_judge(system: str, prompt: str) -> str:
     """Ask Claude to grade. Returns its raw text, which your parse_verdict() has to read."""
-    response = llm.call_model(system, [{"role": "user", "content": prompt}], tools=[], max_tokens=2000)
+    response = llm.call_model(
+        system, [{"role": "user", "content": prompt}], tools=[], max_tokens=2000
+    )
     return "\n".join(b["text"] for b in response["content"] if b["type"] == "text")
 
 
@@ -87,19 +145,34 @@ class FakeJudge:
         question, reference = _tag(prompt, "question") or "", _tag(prompt, "reference")
         answer, evidence = _tag(prompt, "answer"), _tag(prompt, "evidence") or ""
         if reference is None or answer is None:
-            return ("I'm sorry, I can't find what to grade. Put the answer in <answer> tags and the reference in "
-                    "<reference> tags.")
+            return (
+                "I'm sorry, I can't find what to grade. Put the answer in <answer> tags and the reference in "
+                "<reference> tags."
+            )
 
-        ref_words = set(tokenize(re.sub(r"\(.*?\)", "", reference)))  # ignore "(coroner-report)" citations
+        ref_words = set(
+            tokenize(re.sub(r"\(.*?\)", "", reference))
+        )  # ignore "(coroner-report)" citations
         overlap = len(ref_words & set(tokenize(answer))) / max(len(ref_words), 1)
-        unsupported = [n for n in re.findall(r"\d{1,2}:\d{2}|\d+", answer)
-                       if n not in reference + question + evidence]
-        length_rule = re.search(r"\b(length|long|longer|verbose|verbosity)\b", system, re.IGNORECASE)
+        unsupported = [
+            n
+            for n in re.findall(r"\d{1,2}:\d{2}|\d+", answer)
+            if n not in reference + question + evidence
+        ]
+        length_rule = re.search(
+            r"\b(length|long|longer|verbose|verbosity)\b", system, re.IGNORECASE
+        )
 
         if len(answer) > 350 and not length_rule:
-            verdict, reason = "pass", "A thorough and detailed answer that covers the question well."
+            verdict, reason = (
+                "pass",
+                "A thorough and detailed answer that covers the question well.",
+            )
         elif unsupported:
-            verdict, reason = "fail", f"The answer states {', '.join(unsupported)}, which the evidence doesn't support."
+            verdict, reason = (
+                "fail",
+                f"The answer states {', '.join(unsupported)}, which the evidence doesn't support.",
+            )
         elif overlap >= 0.45:
             verdict, reason = "pass", "The answer agrees with the reference."
         else:
@@ -114,12 +187,15 @@ class FakeJudge:
             return body
         if style == 1:
             return f"```json\n{body}\n```"
-        return f"Let me compare the answer with the reference and the evidence.\n\n{body}"
+        return (
+            f"Let me compare the answer with the reference and the evidence.\n\n{body}"
+        )
 
 
 # ---------------------------------------------------------------------------
 # Recording a run
 # ---------------------------------------------------------------------------
+
 
 def record_run(cases: list[dict], case_file, model, max_turns: int = 6) -> list[dict]:
     """Ask the detective (app/) every golden question in a fresh investigation and record what happened.
@@ -135,10 +211,20 @@ def record_run(cases: list[dict], case_file, model, max_turns: int = 6) -> list[
             calls += 1
             return model(system, messages, tools)
 
-        turn = detective.Investigation(case_file, max_turns=max_turns).ask(case["question"], counted)
-        records.append({"case_id": case["id"], "question": case["question"], "answer": turn["reply"],
-                        "tool_calls": turn["tool_calls"], "model_calls": calls,
-                        "status": turn["status"], "pending": turn["pending"]})
+        turn = detective.Investigation(case_file, max_turns=max_turns).ask(
+            case["question"], counted
+        )
+        records.append(
+            {
+                "case_id": case["id"],
+                "question": case["question"],
+                "answer": turn["reply"],
+                "tool_calls": turn["tool_calls"],
+                "model_calls": calls,
+                "status": turn["status"],
+                "pending": turn["pending"],
+            }
+        )
     return records
 
 
@@ -147,7 +233,9 @@ def main(argv=None):
 
     from .dataset import load_golden
 
-    parser = argparse.ArgumentParser(description="Record a run of the detective over the golden dataset.")
+    parser = argparse.ArgumentParser(
+        description="Record a run of the detective over the golden dataset."
+    )
     parser.add_argument("--model", choices=["fake", "claude"], default="fake")
     parser.add_argument("--out", type=Path, required=True)
     args = parser.parse_args(argv)
@@ -157,7 +245,9 @@ def main(argv=None):
     model = llm.call_model if args.model == "claude" else llm.fake_model
     records = record_run(cases, case_file, model)
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_text("".join(json.dumps(r) + "\n" for r in records), encoding="utf-8")
+    args.out.write_text(
+        "".join(json.dumps(r) + "\n" for r in records), encoding="utf-8"
+    )
     print(f"Recorded {len(records)} cases to {args.out}")
 
 

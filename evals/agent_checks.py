@@ -39,16 +39,18 @@ def agent_checks(case: dict, record: dict, max_model_calls: int = 6) -> dict:
                 calls to ``EVIDENCE_TOOLS``.
             passed: All four checks above hold.
     """
-    useful_tool = any(tool["name"] in case["agent"]["useful_tools"] for tool in record["tool_calls"])
+    useful_tool = any(
+        tool["name"] in case["agent"]["useful_tools"] for tool in record["tool_calls"]
+    )
     within_budget = record["model_calls"] <= max_model_calls
     no_tool_errors = all(not tool["is_error"] for tool in record["tool_calls"])
-    if (
-            (record["pending"] and record["pending"]["tool"] == "accuse") or
-            (any(tool["name"] == "accuse" for tool in record["tool_calls"]))
+    if (record["pending"] and record["pending"]["tool"] == "accuse") or (
+        any(tool["name"] == "accuse" for tool in record["tool_calls"])
     ):
         if case["agent"]["may_accuse"]:
             evidence_calls = [
-                tool["name"] for tool in record["tool_calls"]
+                tool["name"]
+                for tool in record["tool_calls"]
                 if not tool["is_error"] and tool["name"] in EVIDENCE_TOOLS
             ]
             accusation_ok = len(evidence_calls) > 1

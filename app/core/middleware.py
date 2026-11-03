@@ -1,4 +1,5 @@
 """Middleware. Runs for every request."""
+
 import logging
 import time
 import uuid
@@ -36,7 +37,10 @@ async def request_id(request: Request, call_next):
     response.headers["X-Request-ID"] = rid
     logger.info(
         "Method: %s | Path: %s | Status code: %s | Duration: %.1f ms | Id: %s",
-        request.method, request.url.path, response.status_code,
-        (time.perf_counter() - start_time) * 1000, rid
+        request.method,
+        request.url.path,
+        response.status_code,
+        (time.perf_counter() - start_time) * 1000,
+        rid,
     )
     return response

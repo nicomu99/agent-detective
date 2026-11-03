@@ -1,4 +1,5 @@
 """Core utils."""
+
 from .config import Settings, load_settings
 from .log_utils import setup_logging
 from .middleware import request_id

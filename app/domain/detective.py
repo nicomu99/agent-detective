@@ -8,7 +8,19 @@ from app.domain.evidence import EvidenceIndex
 
 # Who did it, hashed so that reading the code doesn't spoil the mystery
 _CULPRIT_HASH = "e69500e67ba4c7c11ef0f68475481ab73ac14b60c0362798cf9e38876a7ce536"
-_TITLES = {"dr", "doctor", "lady", "lord", "colonel", "col", "mr", "mrs", "miss", "the", "butler"}
+_TITLES = {
+    "dr",
+    "doctor",
+    "lady",
+    "lord",
+    "colonel",
+    "col",
+    "mr",
+    "mrs",
+    "miss",
+    "the",
+    "butler",
+}
 
 BRIEFING = (
     "Blackwood Manor, Sunday 15 November 1931, 08:00. Lord Edmund Blackwood was found dead in his "
@@ -57,7 +69,9 @@ class CaseFile:
                 contains no Markdown files.
             json.JSONDecodeError: If ``suspects.json`` is not valid JSON.
         """
-        suspects = json.loads((Path(case_dir) / "suspects.json").read_text(encoding="utf-8"))
+        suspects = json.loads(
+            (Path(case_dir) / "suspects.json").read_text(encoding="utf-8")
+        )
         return cls(EvidenceIndex.from_dir(case_dir), suspects)
 
     def find_suspect(self, name: str) -> str:
@@ -80,8 +94,11 @@ class CaseFile:
                 suspects so the model can retry with a better name.
         """
         words = {w.strip(".,").lower() for w in name.split()} - _TITLES
-        matches = [sid for sid, s in self.suspects.items()
-                   if words & ({w.strip(".,").lower() for w in s["name"].split()} - _TITLES)]
+        matches = [
+            sid
+            for sid, s in self.suspects.items()
+            if words & ({w.strip(".,").lower() for w in s["name"].split()} - _TITLES)
+        ]
         if len(matches) != 1:
             known = ", ".join(s["name"] for s in self.suspects.values())
             problem = "matches more than one suspect" if matches else "is not a suspect"
@@ -106,12 +123,15 @@ def is_culprit(suspect_id: str) -> bool:
         True if ``suspect_id`` is the culprit, False otherwise. An unknown
         id simply returns False.
     """
-    return hashlib.sha256(f"blackwood:{suspect_id}".encode()).hexdigest() == _CULPRIT_HASH
+    return (
+        hashlib.sha256(f"blackwood:{suspect_id}".encode()).hexdigest() == _CULPRIT_HASH
+    )
 
 
 # ---------------------------------------------------------------------------
 # Step 2: Tools
 # ---------------------------------------------------------------------------
+
 
 def search_evidence(inv: "Investigation", query: str) -> str:
     """Searches all case files and returns the best-matching passages.
@@ -136,7 +156,7 @@ def search_evidence(inv: "Investigation", query: str) -> str:
     top_k = inv.case_file.index.search(query)
     if len(top_k) == 0:
         raise ValueError(f"No case files found for query {query}.")
-    return "\n".join([f"[{r["doc_id"]}] {r["title"]}: {r["snippet"]}" for r in top_k])
+    return "\n".join([f"[{r['doc_id']}] {r['title']}: {r['snippet']}" for r in top_k])
 
 
 def read_document(inv: "Investigation", doc_id: str) -> str:
@@ -158,7 +178,9 @@ def read_document(inv: "Investigation", doc_id: str) -> str:
     doc = inv.case_file.index.get(doc_id)
     if doc is None:
         documents = ", ".join(inv.case_file.index.document_dict.keys())
-        raise ValueError(f"No document with doc id {doc_id} found. Available doc ids: {documents}")
+        raise ValueError(
+            f"No document with doc id {doc_id} found. Available doc ids: {documents}"
+        )
     return doc["text"]
 
 
@@ -171,7 +193,9 @@ def list_suspects(inv: "Investigation") -> str:
     Returns:
         One line per suspect, formatted as ``"Name: role"``.
     """
-    return "\n".join(f"{s["name"]}: {s["role"]}" for s in inv.case_file.suspects.values())
+    return "\n".join(
+        f"{s['name']}: {s['role']}" for s in inv.case_file.suspects.values()
+    )
 
 
 def check_alibi(inv: "Investigation", suspect: str, time: str) -> str:
@@ -194,17 +218,23 @@ def check_alibi(inv: "Investigation", suspect: str, time: str) -> str:
             ``suspect`` doesn't match exactly one suspect.
     """
     hours, _, minutes = time.partition(":")
-    if not (hours.isdigit() and minutes.isdigit() and int(hours) < 24 and int(minutes) < 60 and len(minutes) == 2):
+    if not (
+        hours.isdigit()
+        and minutes.isdigit()
+        and int(hours) < 24
+        and int(minutes) < 60
+        and len(minutes) == 2
+    ):
         raise ValueError(f"Time must have format 'HH:MM', e.g. '22:30', got {time!r}")
     time = f"{int(hours):02d}:{minutes}"
 
     candidate_suspect = inv.case_file.find_suspect(suspect)
     candidate_suspect_dict = inv.case_file.suspects[candidate_suspect]
 
-    out = f"Suspect: {candidate_suspect_dict["name"]} "
+    out = f"Suspect: {candidate_suspect_dict['name']} "
     for t in candidate_suspect_dict["timeline"]:
         if t["from"] <= time <= t["to"]:
-            out += f"claims to have been at/in {t["where"]}."
+            out += f"claims to have been at/in {t['where']}."
             witnesses = t["witnesses"]
             if len(witnesses) == 0:
                 out += "There are no witnesses to this claim."
@@ -257,10 +287,17 @@ TOOLS = [
     {
         "name": "search_evidence",
         "description": "Search all case files (statements, coroner's report, police search, will, floor plan) "
-                       "and return the 3 most relevant paragraphs with their doc_id.",
-        "input_schema": {"type": "object", "properties": {
-            "query": {"type": "string", "description": "Keywords, e.g. 'brandy decanter' or 'grey tweed jacket'."}},
-                         "required": ["query"]},
+        "and return the 3 most relevant paragraphs with their doc_id.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "query": {
+                    "type": "string",
+                    "description": "Keywords, e.g. 'brandy decanter' or 'grey tweed jacket'.",
+                }
+            },
+            "required": ["query"],
+        },
     },
     {
         "name": "read_document",
@@ -270,11 +307,11 @@ TOOLS = [
             "properties": {
                 "doc_id": {
                     "type": "string",
-                    "description": "The document identifier, e.g. 'butler-statement.md'."
+                    "description": "The document identifier, e.g. 'butler-statement.md'.",
                 }
             },
             "required": ["doc_id"],
-        }
+        },
     },
     {
         "name": "list_suspects",
@@ -283,7 +320,7 @@ TOOLS = [
             "type": "object",
             "properties": {},
             "required": [],
-        }
+        },
     },
     {
         "name": "check_alibi",
@@ -293,15 +330,15 @@ TOOLS = [
             "properties": {
                 "suspect": {
                     "type": "string",
-                    "description": "The suspect's name, e.g. 'Clara Blackwood'."
+                    "description": "The suspect's name, e.g. 'Clara Blackwood'.",
                 },
                 "time": {
                     "type": "string",
-                    "description": "The time for which to check the alibi in the format 'HH:MM', e.g. '22:20'."
-                }
+                    "description": "The time for which to check the alibi in the format 'HH:MM', e.g. '22:20'.",
+                },
             },
             "required": ["suspect", "time"],
-        }
+        },
     },
     {
         "name": "accuse",
@@ -311,16 +348,16 @@ TOOLS = [
             "properties": {
                 "suspect": {
                     "type": "string",
-                    "description": "The suspect's name, e.g. 'Clara Blackwood'."
+                    "description": "The suspect's name, e.g. 'Clara Blackwood'.",
                 },
                 "reasoning": {
                     "type": "string",
-                    "description": "The reasoning behind the accusation."
-                }
+                    "description": "The reasoning behind the accusation.",
+                },
             },
             "required": ["suspect", "reasoning"],
-        }
-    }
+        },
+    },
 ]
 
 TOOL_FUNCTIONS = {
@@ -337,6 +374,7 @@ RISKY_TOOLS = {"accuse"}
 # ---------------------------------------------------------------------------
 # Step 3: The investigation, an agent loop that can pause for approval
 # ---------------------------------------------------------------------------
+
 
 class InvestigationError(Exception):
     """Raised when an action isn't allowed in the investigation's current state."""
@@ -363,7 +401,9 @@ class Investigation:
         self.case_file = case_file
         self.max_turns = max_turns
         self.messages: list[dict] = []
-        self.pending: dict | None = None  # {"tool": ..., "input": ...} while waiting for approval
+        self.pending: dict | None = (
+            None  # {"tool": ..., "input": ...} while waiting for approval
+        )
         self.verdict: str | None = None  # None, "solved" or "failed"
         self.accused: str | None = None
 
@@ -421,9 +461,17 @@ class Investigation:
                 text, is_error = "Error: Tool execution not approved", True
             else:
                 text, is_error = self.run_tool(block["name"], block["input"])
-            log.append({"name": block["name"], "input": block["input"], "is_error": is_error})
+            log.append(
+                {"name": block["name"], "input": block["input"], "is_error": is_error}
+            )
             tool_results.append(
-                {"type": "tool_result", "tool_use_id": block["id"], "content": text, "is_error": is_error})
+                {
+                    "type": "tool_result",
+                    "tool_use_id": block["id"],
+                    "content": text,
+                    "is_error": is_error,
+                }
+            )
         return {"role": "user", "content": tool_results}
 
     def _agent_loop(self, model, log: list[dict]) -> dict:
@@ -445,16 +493,31 @@ class Investigation:
             response = model(SYSTEM_PROMPT, self.messages, TOOLS)
             self.messages.append({"role": "assistant", "content": response["content"]})
             if response["stop_reason"] != "tool_use":
-                reply = "\n".join(content["text"] for content in response["content"] if content["type"] == "text")
+                reply = "\n".join(
+                    content["text"]
+                    for content in response["content"]
+                    if content["type"] == "text"
+                )
                 break
-            risky_tool_calls = [block for block in response["content"]
-                                if block["type"] == "tool_use" and block["name"] in RISKY_TOOLS]
+            risky_tool_calls = [
+                block
+                for block in response["content"]
+                if block["type"] == "tool_use" and block["name"] in RISKY_TOOLS
+            ]
             if len(risky_tool_calls) > 0:
-                self.pending = {"tool": risky_tool_calls[0]["name"], "input": risky_tool_calls[0]["input"]}
+                self.pending = {
+                    "tool": risky_tool_calls[0]["name"],
+                    "input": risky_tool_calls[0]["input"],
+                }
                 reply = None
                 break
             self.messages.append(self._handle_tool_use(response["content"], False, log))
-        return {"status": self.status, "reply": reply, "tool_calls": log, "pending": self.pending}
+        return {
+            "status": self.status,
+            "reply": reply,
+            "tool_calls": log,
+            "pending": self.pending,
+        }
 
     def ask(self, text: str, model) -> dict:
         """Sends the inspector's message to the agent and runs the loop.
@@ -474,7 +537,9 @@ class Investigation:
             InvestigationError: If the status isn't ``"investigating"``.
         """
         if self.status != "investigating":
-            raise InvestigationError(f"Case status is {self.status}, can not ask questions.")
+            raise InvestigationError(
+                f"Case status is {self.status}, can not ask questions."
+            )
         last = self.messages[-1] if self.messages else None
         if last and last["role"] == "user":
             # Conversation is supposed to alternate user -> assistant -> user -> ...
@@ -508,7 +573,9 @@ class Investigation:
             raise InvestigationError("There is currently no tool call pending.")
         self.pending = None
         log = []
-        self.messages.append(self._handle_tool_use(self.messages[-1]["content"], approved, log))
+        self.messages.append(
+            self._handle_tool_use(self.messages[-1]["content"], approved, log)
+        )
         return self._agent_loop(model, log)
 
     @classmethod
@@ -540,6 +607,6 @@ class Investigation:
             "messages": self.messages,
             "pending": self.pending,
             "verdict": self.verdict,
-            "accused": self.accused
+            "accused": self.accused,
         }
         return inv

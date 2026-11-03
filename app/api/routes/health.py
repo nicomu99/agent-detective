@@ -1,4 +1,5 @@
 """Health routes."""
+
 from fastapi import APIRouter, Request, status
 from fastapi.responses import JSONResponse
 
@@ -41,5 +42,8 @@ def ready(request: Request):
     """
     case_file = getattr(request.app.state, "case_file", None)
     if case_file is None:
-        return JSONResponse(content={"status": "starting"}, status_code=status.HTTP_503_SERVICE_UNAVAILABLE)
+        return JSONResponse(
+            content={"status": "starting"},
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
     return {"status": "ready", "documents": len(case_file.index.documents)}

@@ -1,4 +1,5 @@
 """Evidence routes."""
+
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -39,8 +40,7 @@ def search_evidence(
 
 @router.get("/evidence/{doc_id}", response_model=DocumentResponse)
 def get_evidence_document(
-    doc_id: str,
-    case_file: Annotated[CaseFile, Depends(get_case_file)]
+    doc_id: str, case_file: Annotated[CaseFile, Depends(get_case_file)]
 ) -> DocumentResponse:
     """Returns one complete case file.
 
@@ -56,5 +56,8 @@ def get_evidence_document(
     """
     response_doc = case_file.index.get(doc_id)
     if response_doc is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"No case file with ID {doc_id} found.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"No case file with ID {doc_id} found.",
+        )
     return DocumentResponse(**response_doc)
