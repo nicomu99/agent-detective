@@ -47,7 +47,8 @@ def load_settings() -> Settings:
     case_dir = Path(os.environ.get("CASE_DIR", default=ROOT / "case_files"))
     if not case_dir.exists():
         raise ValueError(
-            f"Path {case_dir} could not be found. Make sure to set the correct path using -e CASE_DIR=<path>"
+            f"Path {case_dir} could not be found. Make sure to set the correct path "
+            "using -e CASE_DIR=<path>"
         )
 
     model = os.environ.get("DETECTIVE_MODEL", "fake").strip().lower()
@@ -66,6 +67,7 @@ def load_settings() -> Settings:
     if redis_url is None:
         raise ValueError(
             "REDIS_URL could not be found: Expected an environment variable. "
-            "Make sure to set the redis url using -e REDIS_URL=<url> or through the manifestation file."
+            "Make sure to set the redis url using -e REDIS_URL=<url> or through the "
+            "manifestation file."
         )
     return Settings(case_dir, model, max_turns, redis_url)

@@ -1,9 +1,12 @@
 """A scorecard and a regression gate.
 
-    python -m evals.scorecard evals/data/runs/v1.jsonl --save evals/data/baseline.json     # record a baseline
-    python -m evals.scorecard evals/data/runs/v2.jsonl --baseline evals/data/baseline.json # exit code 1 on a regression
+python -m evals.scorecard evals/data/runs/v1.jsonl --save evals/data/baseline.json
+    # record a baseline
+python -m evals.scorecard evals/data/runs/v2.jsonl --baseline evals/data/baseline.json
+    # exit code 1 on a regression
 
-main() prints the scorecard and turns compare() into an exit code, which is all CI needs.
+main() prints the scorecard and turns compare() into an exit code, which is all CI
+needs.
 
 The scorecard includes:
 - answers.correct: Share of graded answers with all required and no forbidden phrases.
@@ -52,24 +55,31 @@ def build_scorecard(cases: list[dict], run: dict, index, judge, k: int = 3) -> d
 
     Cases are split into three groups:
     - every golden case: retrieval (live against ``index``) and ``coverage``.
-    - cases in the run: the agent checks and the model-call count. This includes the unanswerable
-      cases, because those are the ones that test whether the agent accuses without enough evidence.
-    - graded cases (in the run and with a ``reference_answer``): the code checks and the judge.
+    - cases in the run: the agent checks and the model-call count. This includes the
+        unanswerable cases, because those are the ones that test whether the agent
+        accuses without enough evidence.
+    - graded cases (in the run and with a ``reference_answer``): the code checks and the
+        judge.
 
     Args:
         cases: The golden cases, as returned by ``load_golden``.
         run: The recorded run, mapping case id to its record (see ``load_run``).
-        index: The evidence index, used for the retrieval evals and as the judge's evidence.
-        judge: Any ``judge(system, prompt) -> str``, e.g. ``FakeJudge`` or ``claude_judge``.
+        index: The evidence index, used for the retrieval evals and as the
+            judge's evidence.
+        judge: Any ``judge(system, prompt) -> str``, e.g. ``FakeJudge`` or
+            ``claude_judge``.
         k: The number of hits retrieval is evaluated at.
 
     Returns:
         A dict mapping metric name to value:
-            answers.correct: Share of graded answers with all required and no forbidden phrases.
-            answers.cites_sources: Share of graded answers that cite a relevant document.
+            answers.correct: Share of graded answers with all required and no forbidden
+                phrases.
+            answers.cites_sources: Share of graded answers that cite a relevant
+                document.
             answers.judge_pass: Share of graded answers the judge passed.
             agent.pass: Share of runs that passed every agent check.
-            agent.safe_accusations: Share of runs with no accusation, or a justified one.
+            agent.safe_accusations: Share of runs with no accusation, or a
+                justified one.
             agent.avg_model_calls: Mean number of model calls per run. Lower is better.
             coverage: Share of golden cases present in the run.
             retrieval.recall@<k>: Mean recall at ``k``.
@@ -120,18 +130,19 @@ def build_scorecard(cases: list[dict], run: dict, index, judge, k: int = 3) -> d
 def compare(baseline: dict, current: dict, tolerance: float = 0.02) -> list[str]:
     """Lists every metric that got worse than the baseline by more than the tolerance.
 
-    Higher is better for every metric except those in ``LOWER_IS_BETTER``. A metric that is in the
-    baseline but missing from the current scorecard counts as a regression. Metrics that only exist
-    in the current scorecard are ignored.
+    Higher is better for every metric except those in ``LOWER_IS_BETTER``. A metric that
+    is in the baseline but missing from the current scorecard counts as a regression.
+    Metrics that only exist in the current scorecard are ignored.
 
     Args:
-        baseline: A scorecard from ``build_scorecard``, usually loaded from the saved baseline file.
+        baseline: A scorecard from ``build_scorecard``, usually loaded from the saved
+            baseline file.
         current: The scorecard to check.
         tolerance: How much worse a metric may get before it counts as a regression.
 
     Returns:
-        One human-readable line per regression, e.g. ``"agent.pass: 1.000 -> 0.800"``. Empty if
-        nothing regressed.
+        One human-readable line per regression, e.g. ``"agent.pass: 1.000 -> 0.800"``.
+        Empty if nothing regressed.
     """
     ret = []
     for metric_key, base_val in baseline.items():

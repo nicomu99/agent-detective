@@ -23,16 +23,19 @@ _TITLES = {
 }
 
 BRIEFING = (
-    "Blackwood Manor, Sunday 15 November 1931, 08:00. Lord Edmund Blackwood was found dead in his "
-    "library last night. The lane was flooded, so the killer is still in the house. You have the case "
-    "files, the suspects' accounts of their evening, and one accusation. Make it count."
+    "Blackwood Manor, Sunday 15 November 1931, 08:00. Lord Edmund Blackwood was found "
+    "dead in his library last night. The lane was flooded, so the killer is still in "
+    "the house. You have the case files, the suspects' accounts of their evening, and "
+    "one accusation. Make it count."
 )
 
-SYSTEM_PROMPT = """You are Sergeant Wilkes, assisting the inspector (the user) on the Blackwood Manor murder case.
-Help the inspector by digging through the evidence with your tools. Look things up instead of guessing,
-and name the case file (doc_id) every fact comes from. Point out contradictions between statements.
-You do not know who the murderer is. Never call `accuse` unless the inspector explicitly tells you to
-accuse someone; there is only one accusation per case. Keep answers short, and stay in character."""
+SYSTEM_PROMPT = """You are Sergeant Wilkes, assisting the inspector (the user) on the 
+Blackwood Manor murder case. Help the inspector by digging through the evidence with 
+your tools. Look things up instead of guessing, and name the case file (doc_id) every 
+fact comes from. Point out contradictions between statements. You do not know who the 
+murderer is. Never call `accuse` unless the inspector explicitly tells you to accuse 
+someone; there is only one accusation per case. Keep answers short, and stay in 
+character."""
 
 
 class CaseFile:
@@ -275,25 +278,29 @@ def accuse(inv: "Investigation", suspect: str, reasoning: str) -> str:
         inv.verdict = "solved"
         return f"""The suspect {inv.accused} could no longer hide it.
             They tried to sneak out the back into the gardens, but to no avail.
-            Their time has come and Blackwood Manor is once again free of evil energies. {reasoning}
+            Their time has come and Blackwood Manor is once again free of evil energies.
+            {reasoning}
             """
     inv.verdict = "failed"
-    return f"""Even though the detectives worked with in a sheer perfect manner, the true suspect remains hidden.
-        {inv.accused} has remained behind bars for weeks now, always claiming innocence. And they were right!
+    return f"""Even though the detectives worked with in a sheer perfect manner, the 
+        true suspect remains hidden. {inv.accused} has remained behind bars for weeks 
+        now, always claiming innocence. And they were right!
         """
 
 
 TOOLS = [
     {
         "name": "search_evidence",
-        "description": "Search all case files (statements, coroner's report, police search, will, floor plan) "
-        "and return the 3 most relevant paragraphs with their doc_id.",
+        "description": "Search all case files (statements, coroner's report, police "
+                       "search, will, floor plan) and return the 3 most relevant "
+                       "paragraphs with their doc_id.",
         "input_schema": {
             "type": "object",
             "properties": {
                 "query": {
                     "type": "string",
-                    "description": "Keywords, e.g. 'brandy decanter' or 'grey tweed jacket'.",
+                    "description": "Keywords, e.g. 'brandy decanter' or "
+                                   "'grey tweed jacket'.",
                 }
             },
             "required": ["query"],
@@ -307,7 +314,8 @@ TOOLS = [
             "properties": {
                 "doc_id": {
                     "type": "string",
-                    "description": "The document identifier, e.g. 'butler-statement.md'.",
+                    "description": "The document identifier, e.g. "
+                                   "'butler-statement.md'.",
                 }
             },
             "required": ["doc_id"],
@@ -334,7 +342,8 @@ TOOLS = [
                 },
                 "time": {
                     "type": "string",
-                    "description": "The time for which to check the alibi in the format 'HH:MM', e.g. '22:20'.",
+                    "description": "The time for which to check the alibi in the "
+                                   "format 'HH:MM', e.g. '22:20'.",
                 },
             },
             "required": ["suspect", "time"],
@@ -544,7 +553,8 @@ class Investigation:
         if last and last["role"] == "user":
             # Conversation is supposed to alternate user -> assistant -> user -> ...
             # Keep history clean by merging user turns
-            # This is an edge case that might happen on network errors or when max_turns is hit
+            # This is an edge case that might happen on network errors or when
+            # max_turns is hit
             if isinstance(last["content"], str):
                 last["content"] = [{"type": "text", "text": last["content"]}]
             last["content"].append({"type": "text", "text": text})

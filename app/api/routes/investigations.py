@@ -143,7 +143,7 @@ async def ask(
     try:
         turn = await asyncio.to_thread(investigation.ask, body.text, model)
     except InvestigationError as e:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))  # noqa: B904
     await inv_store.save(investigation_id, investigation)
     return TurnResponse.model_validate(turn)
 
@@ -182,6 +182,6 @@ async def decide(
     try:
         turn = await asyncio.to_thread(investigation.decide, body.approved, model)
     except InvestigationError as e:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))  # noqa: B904
     await inv_store.save(investigation_id, investigation)
     return TurnResponse.model_validate(turn)

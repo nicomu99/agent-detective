@@ -1,17 +1,19 @@
 """Plumbing around your evals.
 
-    load_run(path)              read a recorded run (one JSON line per golden case) into {case_id: record}
-    evidence_for(index, case)   the full text of a case's relevant documents, for the judge
-    FakeJudge(seed, noise)      a stand-in judge model, so no API key is needed
-    claude_judge(system, prompt)  the real judge (needs ANTHROPIC_API_KEY)
-    record_run(...)             run the detective on every golden question and record what it did
+    load_run(path)              read a recorded run (one JSON line per golden case)
+    into {case_id: record} evidence_for(index, case)   the full text of a case's
+    relevant documents, for the judge FakeJudge(seed, noise)      a stand-in judge
+    model, so no API key is needed claude_judge(system, prompt)  the real judge (
+    needs ANTHROPIC_API_KEY) record_run(...)             run the detective on every
+    golden question and record what it did
 
 A judge model is any function judge(system: str, prompt: str) -> str.
 
 Record a fresh run of the detective (app/) from the command line:
 
-    python -m evals.harness --model fake --out evals/data/runs/fake.jsonl
-    python -m evals.harness --model claude --out evals/data/runs/mine.jsonl     # needs ANTHROPIC_API_KEY
+    python -m evals.harness --model fake --out evals/data/runs/fake.jsonl python -m
+    evals.harness --model claude --out evals/data/runs/mine.jsonl     # needs
+    ANTHROPIC_API_KEY
 """
 
 import argparse
@@ -88,8 +90,8 @@ def tokenize(text: str) -> list[str]:
 
 
 def load_run(path: Path) -> dict[str, dict]:
-    """A recorded run, as {case_id: {"case_id", "question", "answer", "tool_calls", "model_calls", "status",
-    "pending"}}."""
+    """A recorded run, as {case_id: {"case_id", "question", "answer", "tool_calls",
+    "model_calls", "status", "pending"}}."""
     records = [
         json.loads(line)
         for line in Path(path).read_text(encoding="utf-8").splitlines()
@@ -99,7 +101,8 @@ def load_run(path: Path) -> dict[str, dict]:
 
 
 def evidence_for(index, case: dict) -> list[dict]:
-    """The case's relevant documents as [{"doc_id", "title", "text"}]. Empty for unanswerable questions."""
+    """The case's relevant documents as [{"doc_id", "title", "text"}]. Empty for
+    unanswerable questions."""
     return [index.get(doc_id) for doc_id in case["relevant_docs"]]
 
 
@@ -109,7 +112,8 @@ def evidence_for(index, case: dict) -> list[dict]:
 
 
 def claude_judge(system: str, prompt: str) -> str:
-    """Ask Claude to grade. Returns its raw text, which your parse_verdict() has to read."""
+    """Ask Claude to grade. Returns its raw text, which your parse_verdict()
+    has to read."""
     response = llm.call_model(
         system, [{"role": "user", "content": prompt}], tools=[], max_tokens=2000
     )
@@ -122,14 +126,14 @@ def _tag(prompt: str, name: str) -> str | None:
 
 
 class FakeJudge:
-    """Pretends to be an LLM judge. It reads the <reference>, <answer> and <evidence> tags from your
-    prompt and grades with a crude rule: pass if the answer contains enough of the reference's
-    words, and every number or time in the answer also appears in the question, the reference or
-    the evidence.
+    """Pretends to be an LLM judge. It reads the <reference>, <answer> and <evidence>
+    tags from your prompt and grades with a crude rule: pass if the answer contains
+    enough of the reference's words, and every number or time in the answer also
+    appears in the question, the reference or the evidence.
 
     Like real judges, it isn't perfect:
-      - it has a verbosity bias: long answers tend to pass, unless the system prompt tells it
-        not to reward length,
+      - it has a verbosity bias: long answers tend to pass, unless the system prompt
+        tells it not to reward length,
       - it misses correct answers that use different words than the reference,
       - with noise > 0, borderline cases come out differently from call to call,
       - it doesn't always answer with clean JSON.
@@ -146,8 +150,8 @@ class FakeJudge:
         answer, evidence = _tag(prompt, "answer"), _tag(prompt, "evidence") or ""
         if reference is None or answer is None:
             return (
-                "I'm sorry, I can't find what to grade. Put the answer in <answer> tags and the reference in "
-                "<reference> tags."
+                "I'm sorry, I can't find what to grade. Put the answer in <answer> "
+                "tags and the reference in <reference> tags."
             )
 
         ref_words = set(
@@ -171,7 +175,8 @@ class FakeJudge:
         elif unsupported:
             verdict, reason = (
                 "fail",
-                f"The answer states {', '.join(unsupported)}, which the evidence doesn't support.",
+                f"The answer states {', '.join(unsupported)}, which the evidence "
+                "doesn't support.",
             )
         elif overlap >= 0.45:
             verdict, reason = "pass", "The answer agrees with the reference."
@@ -198,8 +203,9 @@ class FakeJudge:
 
 
 def record_run(cases: list[dict], case_file, model, max_turns: int = 6) -> list[dict]:
-    """Ask the detective (app/) every golden question in a fresh investigation and record what happened.
-    Accusations are never approved: the record just shows that one is pending."""
+    """Ask the detective (app/) every golden question in a fresh investigation and
+    record what happened. Accusations are never approved: the record just shows that
+    one is pending."""
     from app.domain import detective
 
     records = []

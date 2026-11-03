@@ -2,19 +2,19 @@
 
 Both take (system, messages, tools) and return the next assistant message:
 
-    {"stop_reason": "tool_use" | "end_turn" | ...,
-     "content": [{"type": "text", "text": "..."},
-                 {"type": "tool_use", "id": "toolu_...", "name": "...", "input": {...}}]}
+{"stop_reason": "tool_use" | "end_turn" | ...,
+ "content": [{"type": "text", "text": "..."},
+             {"type": "tool_use", "id": "toolu_...", "name": "...", "input": {...}}]}
 
-  call_model  asks Claude (needs ANTHROPIC_API_KEY).
-  fake_model  a tiny command parser that pretends to be a model, so the whole
-              service runs without an API key. Send it messages like:
-                  search brandy decanter
-                  read coroner-report
-                  suspects
-                  alibi Clara 22:30
-                  accuse Colonel Ashby
-              Anything else is treated as a search.
+call_model  asks Claude (needs ANTHROPIC_API_KEY).
+fake_model  a tiny command parser that pretends to be a model, so the whole
+          service runs without an API key. Send it messages like:
+              search brandy decanter
+              read coroner-report
+              suspects
+              alibi Clara 22:30
+              accuse Colonel Ashby
+          Anything else is treated as a search.
 """
 
 import logging
@@ -39,7 +39,7 @@ def has_api_key() -> bool:
 def call_model(
     system: str, messages: list[dict], tools: list[dict], max_tokens: int = 16000
 ) -> dict:
-    """Send the whole conversation plus the tool list to Claude, return its next message."""
+    """Send the conversation plus the tool list to Claude, return its next message."""
     if not has_api_key():
         raise RuntimeError("ANTHROPIC_API_KEY is not set")
 

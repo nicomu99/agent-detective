@@ -1,15 +1,19 @@
 """How far can you trust the judge? Compare it with human labels.
 
 evals/data/judge_labels.jsonl holds answers a human has graded:
-    {"id": "tod-paraphrase", "case_id": "time-of-death", "answer": "...", "human": "pass", "note": "..."}
+    {"id": "tod-paraphrase", "case_id": "time-of-death",
+    "answer": "...", "human": "pass", "note": "..."}
 
 The module computes
-- the confusion matrix, i.e. the true positive/false positive and true negative/fales negative rate
+- the confusion matrix, i.e. the true positive/false positive and
+    true negative/fales negative rate
 - Cohen's kappa, i.e. how often two graders agree
-- the false positive rate, i.e. the rate of false events marked as positive out of all true negative events
-- the false negative rate, i.e. the rate of positive events marked as negative out of all true positive events
-- the consistency, i.e. the rate of verdicts, where all judges come to the same verdict (only useful if the judge is
-    called multiple times)
+- the false positive rate, i.e. the rate of false events marked as positive out of
+    all true negative events
+- the false negative rate, i.e. the rate of positive events marked as negative out of
+    all true positive events
+- the consistency, i.e. the rate of verdicts, where all judges come to the same verdict
+    (only useful if the judge is called multiple times)
 - disagreements, a list of cases, where the LLM and human-based judges disagree
 """
 
@@ -19,7 +23,8 @@ from .judge import judge_answer
 
 
 def confusion(judge_verdicts: list[str], human_labels: list[str]) -> dict:
-    """Counts the judge's verdicts against the human labels, with "pass" as the positive class.
+    """Counts the judge's verdicts against the human labels, with "pass" as the
+    positive class.
 
     Any judge verdict other than "pass" (including "error") counts as a fail.
 
@@ -28,11 +33,12 @@ def confusion(judge_verdicts: list[str], human_labels: list[str]) -> dict:
         human_labels: The human label per answer, in the same order.
 
     Returns:
-        ``{"tp", "fp", "fn", "tn"}``: true passes, false passes (judge passed, human failed),
+        ``{"tp", "fp", "fn", "tn"}``: true passes, false passes
+        (judge passed, human failed),
         false fails (judge failed, human passed) and true fails.
     """
     tp, fp, fn, tn = 0, 0, 0, 0
-    for j, h in zip(judge_verdicts, human_labels):
+    for j, h in zip(judge_verdicts, human_labels, strict=False):
         if h == "pass":
             if j == h:
                 tp += 1
@@ -59,7 +65,8 @@ def cohen_kappa(a: list[str], b: list[str]) -> float:
 
     Returns:
         1.0 for perfect agreement, 0.0 for chance level, -1.0 for perfect disagreement.
-        Returns 1.0 when kappa is undefined, i.e. both graders give every answer the same label.
+        Returns 1.0 when kappa is undefined, i.e. both graders give every answer the
+        same label.
     """
     cm = confusion(a, b)
     tp, fp, tn, fn = cm["tp"], cm["fp"], cm["tn"], cm["fn"]
@@ -74,16 +81,18 @@ def cohen_kappa(a: list[str], b: list[str]) -> float:
 def measure_judge(
     judge, labels: list[dict], cases_by_id: dict, index, repeats: int = 3
 ) -> dict:
-    """Runs the judge on human-graded answers and measures how well it agrees with the human.
+    """Runs the judge on human-graded answers and measures how well it agrees with the
+    human.
 
-    Each answer is judged ``repeats`` times against its golden case and the case's evidence,
-    and it counts as a pass only if more than half the repeats pass it.
+    Each answer is judged ``repeats`` times against its golden case and the case's
+    evidence, and it counts as a pass only if more than half the repeats pass it.
 
     Args:
         judge: A judge model, ``judge(system, prompt) -> str``.
         labels: Human-graded answers from ``judge_labels.jsonl``, each with ``case_id``,
             ``answer`` and ``human`` ("pass" or "fail").
-        cases_by_id: Golden cases keyed by id. Labels whose case isn't in here are skipped.
+        cases_by_id: Golden cases keyed by id. Labels whose case isn't in here are
+            skipped.
         index: The evidence index, used to look up each case's relevant documents.
         repeats: How many times to judge each answer.
 
@@ -94,7 +103,8 @@ def measure_judge(
             false_pass_rate: Share of human-failed answers the judge passed.
             false_fail_rate: Share of human-passed answers the judge failed.
             consistency: Share of answers where all repeats gave the same verdict.
-            disagreements: The label ``id`` of every answer where judge and human disagree.
+            disagreements: The label ``id`` of every answer where judge and
+                human disagree.
     """
     human_labels = []
     judge_labels = []

@@ -1,7 +1,8 @@
 """The RAG part: search over the case files.
 
 index = EvidenceIndex.from_dir(Path("case_files"))
-index.search("brandy decanter", k=3)   # -> [{"doc_id", "title", "snippet", "score"}, ...]
+index.search("brandy decanter", k=3)
+    # -> [{"doc_id", "title", "snippet", "score"}, ...]
 index.get("coroner-report")            # -> {"doc_id", "title", "text"} or None
 """
 
@@ -85,7 +86,7 @@ def tokenize(text: str) -> list[str]:
 
 
 class EvidenceIndex:
-    """A simple index based on the document "database" that consists of Markdown files."""
+    """Simple index based on the document "database" that consists of Markdown files."""
 
     def __init__(self, documents: list[dict]):
         self.documents = documents

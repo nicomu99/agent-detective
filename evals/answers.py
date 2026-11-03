@@ -1,8 +1,8 @@
 """Answer checks in plain code.
 
-Each golden case contains a list of phrases an answer by the agent should have, should not have and documents
-that contain the information we are searching for. This module checks whether this information is present
-(or not present).
+Each golden case contains a list of phrases an answer by the agent should have, should
+not have and documents that contain the information we are searching for. This module
+checks whether this information is present (or not present).
 """
 
 import re
@@ -27,7 +27,8 @@ def code_checks(case: dict, answer: str | None) -> dict:
     """Simple pipeline that checks whether the answer contains certain phrases.
 
     The pipeline checks whether the case file's requirements are met:
-    - `must_include`: contains a list of lists. For each list, one phrase must be present in the answer to pass.
+    - `must_include`: contains a list of lists. For each list, one phrase must be
+        present in the answer to pass.
     - `must_not_include`: none of these phrases shall be present in the answer.
     - `relevant_docs`: at least one relevant document should be cited in the answer.
 
@@ -36,8 +37,8 @@ def code_checks(case: dict, answer: str | None) -> dict:
         answer: Response of an agent to the query of case.
 
     Returns:
-        A dictionary with boolean flags for each check, as well as a `passed` flag that is true if all other checks
-        passed.
+        A dictionary with boolean flags for each check, as well as a `passed` flag that
+        is true if all other checks passed.
     """
     if answer is None:
         return {"includes": True, "excludes": True, "cites": True, "passed": True}
