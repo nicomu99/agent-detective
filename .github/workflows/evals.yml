@@ -3,9 +3,9 @@ name: evals
 on:
   pull_request:
     paths:
-      - "detective-exercise/app/**"
-      - "detective-exercise/evals/**"
-      - "detective-exercise/case_files/**"
+      - "agent-detective/app/**"
+      - "agent-detective/evals/**"
+      - "agent-detective/case_files/**"
   push:
     branches: [main]
   workflow_dispatch:
@@ -49,6 +49,6 @@ jobs:
         with:
           name: eval-results
           path: |
-            detective-exercise/evals/data/runs/ci.jsonl
-            detective-exercise/evals/data/scorecard.json
+            agent-detective/evals/data/runs/ci.jsonl
+            agent-detective/evals/data/scorecard.json
  
