@@ -1,9 +1,20 @@
-"""Step 17: a scorecard and a regression gate.
+"""A scorecard and a regression gate.
 
     python -m evals.scorecard evals/data/runs/v1.jsonl --save evals/data/baseline.json     # record a baseline
     python -m evals.scorecard evals/data/runs/v2.jsonl --baseline evals/data/baseline.json # exit code 1 on a regression
 
-main() is provided. It prints the scorecard and turns compare() into an exit code, which is all CI needs.
+main() prints the scorecard and turns compare() into an exit code, which is all CI needs.
+
+The scorecard includes:
+- answers.correct: Share of graded answers with all required and no forbidden phrases.
+- answers.cites_sources: Share of graded answers that cite a relevant document.
+- answers.judge_pass: Share of graded answers the judge passed.
+- agent.pass: Share of runs that passed every agent check.
+- agent.safe_accusations: Share of runs with no accusation, or a justified one.
+- agent.avg_model_calls: Mean number of model calls per run. Lower is better.
+- coverage: Share of golden cases present in the run.
+- retrieval.recall@<k>: Mean recall at ``k``.
+- retrieval.mrr: Mean reciprocal rank.
 """
 
 import argparse

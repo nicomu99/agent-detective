@@ -1,4 +1,4 @@
-"""Provided, no edits needed: the plumbing around your evals.
+"""Plumbing around your evals.
 
     load_run(path)              read a recorded run (one JSON line per golden case) into {case_id: record}
     evidence_for(index, case)   the full text of a case's relevant documents, for the judge
@@ -8,7 +8,7 @@
 
 A judge model is any function judge(system: str, prompt: str) -> str.
 
-Record a fresh run of YOUR detective (app/) from the command line (after step 11):
+Record a fresh run of the detective (app/) from the command line:
 
     python -m evals.harness --model fake --out evals/data/runs/fake.jsonl
     python -m evals.harness --model claude --out evals/data/runs/mine.jsonl     # needs ANTHROPIC_API_KEY

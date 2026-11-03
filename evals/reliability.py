@@ -1,7 +1,16 @@
-"""Step 15: how far can you trust the judge? Compare it with human labels.
+"""How far can you trust the judge? Compare it with human labels.
 
 evals/data/judge_labels.jsonl holds answers a human has graded:
     {"id": "tod-paraphrase", "case_id": "time-of-death", "answer": "...", "human": "pass", "note": "..."}
+
+The module computes
+- the confusion matrix, i.e. the true positive/false positive and true negative/fales negative rate
+- Cohen's kappa, i.e. how often two graders agree
+- the false positive rate, i.e. the rate of false events marked as positive out of all true negative events
+- the false negative rate, i.e. the rate of positive events marked as negative out of all true positive events
+- the consistency, i.e. the rate of verdicts, where all judges come to the same verdict (only useful if the judge is
+    called multiple times)
+- disagreements, a list of cases, where the LLM and human-based judges disagree
 """
 
 from evals.harness import evidence_for  # noqa: F401  (you'll want it in measure_judge)

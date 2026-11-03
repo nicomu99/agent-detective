@@ -1,4 +1,9 @@
-"""Answer checks in plain code."""
+"""Answer checks in plain code.
+
+Each golden case contains a list of phrases an answer by the agent should have, should not have and documents
+that contain the information we are searching for. This module checks whether this information is present
+(or not present).
+"""
 import re
 
 

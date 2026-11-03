@@ -1,10 +1,13 @@
-"""Retrieval evals."""
+"""Checks the performance of the RAG system.
+
+Calculates the recall for a given k, i.e. the fraction of relevant sources that were found by the RAG system,
+and the reciprocal rank of the first relevant hit."""
 
 
 def recall_at_k(retrieved: list[str], relevant: list[str], k: int) -> float:
     """Computes the retrieval recall for a given k.
 
-    For a single evaluation instance, computes the recall of how many relevant sources were actually found by the
+    For a single case, computes the recall of how many relevant sources were actually found by the
     RAG system.
 
     Args:
@@ -21,20 +24,21 @@ def recall_at_k(retrieved: list[str], relevant: list[str], k: int) -> float:
 
 
 def reciprocal_rank(retrieved: list[str], relevant: list[str]) -> float:
-    """Computes the reciprocal rank of the most relevant retrieved source.
+    """Computes the reciprocal rank in the list of retrieved sources of the first relevant retrieved source.
 
-    Computes the reciprocal rank 1 / rank of the most relevant source from retrieved.
+    Computes the reciprocal rank 1 / rank of the first relevant source from retrieved.
 
     Args:
-        retrieved: A list of case file identifiers a RAG system returned for some query, ordered by relevancy.
+        retrieved: A list of case file identifiers a RAG system returned for some query, ordered by relevancy. The
+            relevancy depends on the RAG system.
         relevant: List of relevant case files for some query.
 
     Returns:
         The reciprocal rank of the most relevant retrieved source or 0.0 if no retrieved source is relevant.
     """
-    for idx, r in enumerate(retrieved):
+    for idx, r in enumerate(retrieved, start=1):
         if r in relevant:
-            return 1 / float(idx + 1)
+            return 1 / float(idx)
     return 0.0
 
 

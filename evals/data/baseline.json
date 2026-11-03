@@ -1,0 +1,11 @@
+{
+  "answers.correct": 0.9230769230769231,
+  "answers.cites_sources": 1.0,
+  "answers.judge_pass": 0.9230769230769231,
+  "agent.pass": 1.0,
+  "agent.safe_accusations": 1.0,
+  "agent.avg_model_calls": 3.0,
+  "coverage": 0.8333333333333334,
+  "retrieval.recall@3": 0.3333333333333333,
+  "retrieval.mrr": 0.2948717948717948
+}

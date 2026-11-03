@@ -194,3 +194,93 @@ Every response carries an `X-Request-ID` header. Send your own (`-H "X-Request-I
 | `409` | Action not allowed right now (asking while an accusation awaits approval, approving when nothing is pending, or the case is closed) |
 | `422` | Invalid request (empty text, `k` out of range, `approved` not a boolean)                                                            |
 | `503` | `/ready` before startup has finished                                                                                                |
+
+## Evaluation
+
+The evals in `evals/` measure how well the detective retrieves evidence, answers questions and behaves as an agent. They
+also compare a new version of the agent against a saved baseline to catch regressions.
+
+> **Spoiler warning:** `evals/data/golden.jsonl` and `evals/data/judge_labels.jsonl` contain the clues and the solution
+> to the case. Don't open them if you want to play first.
+
+### The golden dataset
+
+`evals/data/golden.jsonl` holds one test case per line: a question for the detective plus what a good answer
+looks like. That covers the case files it should rest on (`relevant_docs`), the phrases it must and must not contain,
+a reference answer for the judge, and which tools the agent should use and whether it may accuse. Each case has a
+category: `fact`, `alibi`, `contradiction`, `unanswerable` or `accusation`. `evals/dataset.py` validates every case on
+load and stops at the first malformed one, so a broken dataset fails loudly. The module docstring documents the full
+format.
+
+### What is evaluated
+
+| Eval                  | What it measures                                                                                                                                                                                  | Where                    |
+|-----------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------|
+| **Retrieval**         | Recall@k and mean reciprocal rank of the TF-IDF index against each case's `relevant_docs`. Runs live against `app/`, so it needs no recorded run.                                                  | `evals/retrieval.py`     |
+| **Answer checks**     | Plain-code checks on the answer: are the required phrases there, are the forbidden ones absent, and does it cite a relevant case file?                                                             | `evals/answers.py`       |
+| **LLM judge**         | A judge model compares the answer with the reference answer and the evidence, and decides whether it is correct, grounded and honest about what the files don't say.                              | `evals/judge.py`         |
+| **Judge reliability** | Compares the judge with human-graded answers in `judge_labels.jsonl`: accuracy, Cohen's kappa, false pass and false fail rates, and how consistent the judge is across repeated calls.            | `evals/reliability.py`   |
+| **Agent checks**      | Grades what the agent *did*, not only what it said: it used a useful tool, stayed within the model-call budget, had no failing tool calls, and only accused when allowed and after enough evidence. | `evals/agent_checks.py`  |
+| **Scorecard**         | Combines everything into one set of metrics and compares them with a baseline.                                                                                                                    | `evals/scorecard.py`     |
+
+The answer, judge and agent evals don't call the detective themselves. They score a **recorded run**: a JSONL file in
+`evals/data/runs/` with the detective's answer, tool calls, model-call count and status for each golden question. This
+keeps scoring cheap and repeatable, and lets you compare two versions of the agent on exactly the same answers.
+
+### Running the evals
+
+**1. Record a run** of the detective in `app/` over every golden question:
+
+```bash
+uv run python -m evals.harness --model fake --out evals/data/runs/fake.jsonl
+uv run python -m evals.harness --model claude --out evals/data/runs/mine.jsonl   # needs ANTHROPIC_API_KEY
+```
+
+Each question gets a fresh investigation. Accusations are never approved: the run only records that one is pending.
+
+**2. Score the run and save it as the baseline:**
+
+```bash
+uv run python -m evals.scorecard evals/data/runs/v1.jsonl --save evals/data/baseline.json
+```
+
+**3. Check a new run against the baseline:**
+
+```bash
+uv run python -m evals.scorecard evals/data/runs/v2.jsonl --baseline evals/data/baseline.json
+```
+
+This prints each metric with its change from the baseline. It exits with code `1` if any metric got worse by more than
+`0.02`, or is missing. Higher is better for every metric except `agent.avg_model_calls`.
+
+Useful options are `--judge claude` to use the real judge instead of the default `FakeJudge` (needs
+`ANTHROPIC_API_KEY`), and `--k` to set the number of hits for retrieval (default `3`).
+
+**Checking the judge.** Judge reliability isn't part of the scorecard and has no command of its own. Run it from Python:
+
+```bash
+uv run python -c '
+import json
+from app.domain import CaseFile
+from evals.dataset import load_golden
+from evals.harness import CASE_DIR, DATA, GOLDEN, FakeJudge
+from evals.reliability import measure_judge
+cf = CaseFile.load(CASE_DIR)
+cases = {c["id"]: c for c in load_golden(GOLDEN, {d["doc_id"] for d in cf.index.documents})}
+labels = [json.loads(l) for l in (DATA / "judge_labels.jsonl").open() if l.strip()]
+print(measure_judge(FakeJudge(seed=0), labels, cases, cf.index))
+'
+```
+
+Swap `FakeJudge(seed=0)` for `claude_judge` (imported from `evals.harness`) to measure the real judge.
+
+### Things to keep in mind
+
+- **The fake judge and fake model are stand-ins.** They let everything run without an API key, but their scores say
+  nothing about the real agent. Use `--model claude` and `--judge claude` for numbers that matter. Both cost API calls.
+- **Update the baseline on purpose.** Run `--save` only after a run you've decided is the new standard. Otherwise a
+  regression becomes the new normal.
+- **Coverage below 1.0** means the run is missing golden cases. Usually the run was recorded before cases were added,
+  so record it again.
+- **Keep the dataset honest.** When you add a case, check that its `relevant_docs` really hold the answer. Otherwise
+  the retrieval and answer metrics measure the dataset, not the agent.

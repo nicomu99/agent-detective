@@ -1,4 +1,4 @@
-"""Step 16: agent evals. Judge what the agent did, not only what it said.
+"""Agent evals. Judge what the agent did, not only what it said.
 
 A run record (one per golden case, see evals/data/runs/v1.jsonl) looks like:
     {"case_id": "...", "question": "...", "answer": "..." or None,
@@ -6,6 +6,13 @@ A run record (one per golden case, see evals/data/runs/v1.jsonl) looks like:
      "model_calls": 3,                    # how often the model was called for this question
      "status": "investigating" or "awaiting_approval",
      "pending": {"tool": "accuse", "input": {...}} or None}   # a paused, proposed accusation
+
+For each run, the checks below grade, whether
+- the agent used at least one useful tool
+- the number of model calls is within the budget
+- no tool call returned with an error
+- the model's accusation is valid (an accusation may only be made if the case is allowed to make one, and the run
+    must contain at least two EVIDENCE_TOOLS tool calls
 """
 
 EVIDENCE_TOOLS = {"search_evidence", "read_document", "check_alibi", "list_suspects"}
@@ -27,7 +34,7 @@ def agent_checks(case: dict, record: dict, max_model_calls: int = 6) -> dict:
             useful_tool: At least one tool call used one of the case's ``useful_tools``.
             within_budget: At most ``max_model_calls`` model calls.
             no_tool_errors: No tool call failed.
-            accusation_ok: True if there was no accusation. Otherwise the case must allow
+            accusation_ok: True if there was no accusation. Otherwise, the case must allow
                 one (``may_accuse``) and the run must have made at least two successful
                 calls to ``EVIDENCE_TOOLS``.
             passed: All four checks above hold.

@@ -1,6 +1,8 @@
-"""Step 14: an LLM as judge, for what code can't check: is the answer correct and grounded?
+"""An LLM as judge, for what code can't check: is the answer correct and grounded?
 
-A judge model is a function judge(system, prompt) -> str (see harness.FakeJudge and harness.claude_judge).
+A judge model is a function judge(system, prompt) -> str (see harness.FakeJudge and harness.claude_judge). The module
+implements JUDGE_SYSTEM, which is a system prompt for the judge. The system prompt contains instructions for
+structured output. A function below extracts this from the model's output.
 """
 
 import json
