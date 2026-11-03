@@ -1,0 +1,54 @@
+name: evals
+
+on:
+  pull_request:
+    paths:
+      - "detective-exercise/app/**"
+      - "detective-exercise/evals/**"
+      - "detective-exercise/case_files/**"
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: evals-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  evals:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: agent-detective
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --locked
+
+      - name: Record a run with Claude
+        run: uv run python -m evals.harness --model claude --out evals/data/runs/ci.jsonl
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Score it against the baseline   # exit code 1 on a regression -> the step, job and PR check go red
+        run: python -m evals.scorecard evals/data/runs/ci.jsonl --baseline evals/data/baseline.json --save evals/data/scorecard.json
+
+      - name: Keep the run and scorecard
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-results
+          path: |
+            detective-exercise/evals/data/runs/ci.jsonl
+            detective-exercise/evals/data/scorecard.json
+ 
