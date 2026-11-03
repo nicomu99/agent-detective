@@ -2,12 +2,15 @@ name: evals
 
 on:
   pull_request:
-    paths:
-      - "agent-detective/app/**"
-      - "agent-detective/evals/**"
-      - "agent-detective/case_files/**"
+    paths: &code
+      - "app/**"
+      - "evals/**"
+      - "case_files/**"
+      - "pyproject.toml"
+      - "uv.lock"
   push:
     branches: [main]
+    paths: *code
   workflow_dispatch:
 
 concurrency:
@@ -21,9 +24,6 @@ jobs:
   evals:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    defaults:
-      run:
-        working-directory: agent-detective
 
     steps:
       - uses: actions/checkout@v4
@@ -41,7 +41,7 @@ jobs:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
       - name: Score it against the baseline   # exit code 1 on a regression -> the step, job and PR check go red
-        run: python -m evals.scorecard evals/data/runs/ci.jsonl --baseline evals/data/baseline.json --save evals/data/scorecard.json
+        run: uv run python -m evals.scorecard evals/data/runs/ci.jsonl --baseline evals/data/baseline.json --save evals/data/scorecard.json
 
       - name: Keep the run and scorecard
         if: always()
@@ -49,6 +49,5 @@ jobs:
         with:
           name: eval-results
           path: |
-            agent-detective/evals/data/runs/ci.jsonl
-            agent-detective/evals/data/scorecard.json
- 
+            evals/data/runs/ci.jsonl
+            evals/data/scorecard.json
