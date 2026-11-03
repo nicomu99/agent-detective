@@ -2,17 +2,17 @@
 
     uvicorn app.main:app --reload      then open http://127.0.0.1:8000/docs
 """
-import os
 import logging
+import os
 from contextlib import asynccontextmanager
 
 import redis.asyncio as redis
 from fastapi import FastAPI
 
-from app.core import setup_logging, request_id, load_settings
-from app.api.routes import health, evidence, investigations
-from app.repositories import InvestigationStore
+from app.api.routes import evidence, health, investigations
+from app.core import load_settings, request_id, setup_logging
 from app.domain.detective import CaseFile
+from app.repositories import InvestigationStore
 
 logger = logging.getLogger(__name__)
 

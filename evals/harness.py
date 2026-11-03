@@ -26,11 +26,10 @@ ROOT = Path(__file__).resolve().parent.parent
 CASE_DIR = ROOT / "case_files"
 DATA = Path(__file__).resolve().parent / "data"
 GOLDEN = DATA / "golden.jsonl"
-STOPWORDS = set(
-    "a an and are as at be by did do does for from had has have he her his how i if in is it "
-    "its me my of on or she so that the their them there they this to was we were what when "
-    "where which who will with you your".split()
-)
+STOPWORDS = {"a", "an", "and", "are", "as", "at", "be", "by", "did", "do", "does", "for", "from", "had", "has", "have",
+             "he", "her", "his", "how", "i", "if", "in", "is", "it", "its", "me", "my", "of", "on", "or", "she", "so",
+             "that", "the", "their", "them", "there", "they", "this", "to", "was", "we", "were", "what", "when",
+             "where", "which", "who", "will", "with", "you", "your"}
 
 
 def tokenize(text: str) -> list[str]:
@@ -38,7 +37,8 @@ def tokenize(text: str) -> list[str]:
 
 
 def load_run(path: Path) -> dict[str, dict]:
-    """A recorded run, as {case_id: {"case_id", "question", "answer", "tool_calls", "model_calls", "status", "pending"}}."""
+    """A recorded run, as {case_id: {"case_id", "question", "answer", "tool_calls", "model_calls", "status",
+    "pending"}}."""
     records = [json.loads(line) for line in Path(path).read_text(encoding="utf-8").splitlines() if line.strip()]
     return {r["case_id"]: r for r in records}
 
@@ -87,7 +87,8 @@ class FakeJudge:
         question, reference = _tag(prompt, "question") or "", _tag(prompt, "reference")
         answer, evidence = _tag(prompt, "answer"), _tag(prompt, "evidence") or ""
         if reference is None or answer is None:
-            return "I'm sorry, I can't find what to grade. Put the answer in <answer> tags and the reference in <reference> tags."
+            return ("I'm sorry, I can't find what to grade. Put the answer in <answer> tags and the reference in "
+                    "<reference> tags.")
 
         ref_words = set(tokenize(re.sub(r"\(.*?\)", "", reference)))  # ignore "(coroner-report)" citations
         overlap = len(ref_words & set(tokenize(answer))) / max(len(ref_words), 1)

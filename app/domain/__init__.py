@@ -1,11 +1,11 @@
 """Domain module."""
-from .detective import CaseFile, InvestigationError, Investigation, BRIEFING
+from .detective import BRIEFING, CaseFile, Investigation, InvestigationError
 from .evidence import EvidenceIndex
 
 __all__ = [
-    "CaseFile",
-    "InvestigationError",
-    "Investigation",
     "BRIEFING",
+    "CaseFile",
     "EvidenceIndex",
+    "Investigation",
+    "InvestigationError",
 ]

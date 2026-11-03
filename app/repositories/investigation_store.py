@@ -1,9 +1,10 @@
 """Investigation store."""
-import uuid
 import json
+import uuid
+
 import redis.asyncio as redis
 
-from app.domain import Investigation, CaseFile
+from app.domain import CaseFile, Investigation
 
 
 class InvestigationStore:

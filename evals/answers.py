@@ -17,9 +17,7 @@ def mentions(text: str, phrase: str) -> bool:
     Returns:
         True if the given phrase could be found in the text, else False.
     """
-    if re.compile(r'\b({0})\b'.format(phrase.lower()), flags=re.IGNORECASE).search(text.lower()):
-        return True
-    return False
+    return bool(re.compile(rf'\b({phrase.lower()})\b', flags=re.IGNORECASE).search(text.lower()))
 
 
 def code_checks(case: dict, answer: str | None) -> dict:

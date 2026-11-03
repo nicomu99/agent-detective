@@ -1,12 +1,11 @@
 """FastAPI dependencies."""
 from typing import Annotated
 
-from fastapi import Request, Depends, status, HTTPException
+from fastapi import Depends, HTTPException, Request, status
 
 from app.core import Settings
-from app.domain import Investigation, CaseFile
+from app.domain import CaseFile, Investigation, llm
 from app.repositories import InvestigationStore
-import app.domain.llm as llm
 
 
 def get_settings(request: Request) -> Settings:

@@ -1,21 +1,27 @@
 """Investigation routes."""
-from typing import Annotated, Callable
-
 import asyncio
 import logging
+from collections.abc import Callable
+from typing import Annotated
 
-from fastapi import APIRouter, status, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 
-from app.api import get_case_file, get_settings, get_store, find_investigation, get_model
+from app.api import (
+    find_investigation,
+    get_case_file,
+    get_model,
+    get_settings,
+    get_store,
+)
 from app.core import Settings
-from app.domain import CaseFile, Investigation, BRIEFING, InvestigationError
+from app.domain import BRIEFING, CaseFile, Investigation, InvestigationError
 from app.repositories import InvestigationStore
 from app.schemas import (
     CreateInvestigationResponse,
+    InvestigationApprovalBody,
+    InvestigationBody,
     InvestigationResponse,
     TurnResponse,
-    InvestigationBody,
-    InvestigationApprovalBody,
 )
 
 logger = logging.getLogger(__name__)
@@ -97,7 +103,6 @@ async def delete_investigation(
     deleted = await inv_store.delete(inv_id)
     if not deleted:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"No investigation with id {inv_id} found.")
-    return None
 
 
 @router.post("/investigations/{investigation_id}/messages", response_model=TurnResponse)
@@ -129,7 +134,7 @@ async def ask(
     """
     logger.info("question for investigation %s", investigation_id)
     if len(body.text) == 0:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=f"Request contains empty body.")
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Request contains empty body.")
     try:
         turn = await asyncio.to_thread(investigation.ask, body.text, model)
     except InvestigationError as e:

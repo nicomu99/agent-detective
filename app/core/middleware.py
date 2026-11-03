@@ -1,7 +1,7 @@
 """Middleware. Runs for every request."""
-import uuid
-import time
 import logging
+import time
+import uuid
 
 from fastapi import Request
 

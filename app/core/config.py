@@ -1,7 +1,7 @@
 """Settings configuration. Gets loaded once on startup."""
 import os
-from pathlib import Path
 from dataclasses import dataclass
+from pathlib import Path
 
 from ..domain import llm
 
@@ -54,14 +54,14 @@ def load_settings() -> Settings:
     if model == "claude" and not llm.has_api_key():
         raise ValueError("DETECTIVE_MODEL=claude needs ANTHROPIC_API_KEY to be set")
 
-    max_turns = int(os.environ.get("MAX_TURNS", 8))
+    max_turns = int(os.environ.get("MAX_TURNS", "8"))
     if max_turns < 1:
         raise ValueError(f"MAX_TURNS {max_turns} invalid. Must be positive integer.")
 
     redis_url = os.environ.get("REDIS_URL", None)
     if redis_url is None:
         raise ValueError(
-            f"REDIS_URL could not be found: Expected an environment variable. "
+            "REDIS_URL could not be found: Expected an environment variable. "
             "Make sure to set the redis url using -e REDIS_URL=<url> or through the manifestation file."
         )
     return Settings(case_dir, model, max_turns, redis_url)

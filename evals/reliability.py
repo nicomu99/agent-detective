@@ -13,9 +13,9 @@ The module computes
 - disagreements, a list of cases, where the LLM and human-based judges disagree
 """
 
-from evals.harness import evidence_for  # noqa: F401  (you'll want it in measure_judge)
+from evals.harness import evidence_for
 
-from .judge import judge_answer  # noqa: F401
+from .judge import judge_answer
 
 
 def confusion(judge_verdicts: list[str], human_labels: list[str]) -> dict:

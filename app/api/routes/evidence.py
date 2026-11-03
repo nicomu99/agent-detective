@@ -1,11 +1,11 @@
 """Evidence routes."""
 from typing import Annotated
 
-from fastapi import APIRouter, Query, Depends, status, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from app.api import get_case_file
-from app.schemas import SearchResponse, SearchHit, DocumentResponse
 from app.domain import CaseFile
+from app.schemas import DocumentResponse, SearchHit, SearchResponse
 
 router = APIRouter()
 
@@ -34,7 +34,7 @@ def search_evidence(
     """
     search_results = case_file.index.search(q, k)
     search_results = [SearchHit(**s) for s in search_results]
-    return SearchResponse(**{"query": q, "hits": search_results})
+    return SearchResponse(query=q, hits=search_results)
 
 
 @router.get("/evidence/{doc_id}", response_model=DocumentResponse)

@@ -16,10 +16,10 @@ Both take (system, messages, tools) and return the next assistant message:
                   accuse Colonel Ashby
               Anything else is treated as a search.
 """
+import logging
 import os
 import re
 import uuid
-import logging
 
 logger = logging.getLogger(__name__)
 

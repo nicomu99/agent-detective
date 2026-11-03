@@ -1,10 +1,10 @@
 """FastAPI declaration."""
-from .deps import get_settings, get_case_file, get_store, find_investigation, get_model
+from .deps import find_investigation, get_case_file, get_model, get_settings, get_store
 
 __all__ = [
-    "get_settings",
-    "get_case_file",
-    "get_store",
     "find_investigation",
+    "get_case_file",
     "get_model",
+    "get_settings",
+    "get_store",
 ]

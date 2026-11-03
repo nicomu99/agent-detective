@@ -1,7 +1,7 @@
 """The agent part: Sergeant Wilkes, a detective's assistant with tools."""
 
-import json
 import hashlib
+import json
 from pathlib import Path
 
 from app.domain.evidence import EvidenceIndex
@@ -396,7 +396,7 @@ class Investigation:
             return f"Error: Unknown tool name {name}", True
         try:
             return TOOL_FUNCTIONS[name](self, **tool_input), False
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             return f"Error: {e}", True
 
     def _handle_tool_use(self, content: list[dict], approved: bool, log: list[dict]):

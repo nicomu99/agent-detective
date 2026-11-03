@@ -6,16 +6,15 @@
 """
 
 import re
-from pathlib import Path
 from collections import Counter
+from pathlib import Path
 
 import numpy as np
 
-STOPWORDS = set(
-    "a an and are as at be by did do does for from had has have he her his how i if in is it "
-    "its me my of on or she so that the their them there they this to was we were what when "
-    "where which who will with you your".split()
-)
+STOPWORDS = {"a", "an", "and", "are", "as", "at", "be", "by", "did", "do", "does", "for", "from", "had", "has", "have",
+             "he", "her", "his", "how", "i", "if", "in", "is", "it", "its", "me", "my", "of", "on", "or", "she", "so",
+             "that", "the", "their", "them", "there", "they", "this", "to", "was", "we", "were", "what", "when",
+             "where", "which", "who", "will", "with", "you", "your"}
 
 
 def tokenize(text: str) -> list[str]:
@@ -89,7 +88,7 @@ class EvidenceIndex:
             word_counter.update(tokenized)
 
         n = len(texts)
-        words = list(sorted(word_counter.keys()))
+        words = sorted(word_counter.keys())
         self.idf = np.zeros(len(words))
         for idx, word in enumerate(words):
             self.vocab[word] = idx

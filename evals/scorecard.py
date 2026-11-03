@@ -24,12 +24,12 @@ from pathlib import Path
 
 from app.domain import CaseFile
 
-from .agent_checks import agent_checks  # noqa: F401
-from .answers import code_checks  # noqa: F401
+from .agent_checks import agent_checks
+from .answers import code_checks
 from .dataset import load_golden
-from .harness import CASE_DIR, GOLDEN, FakeJudge, claude_judge, evidence_for, load_run  # noqa: F401
-from .judge import judge_answer  # noqa: F401
-from .retrieval import evaluate_retrieval  # noqa: F401
+from .harness import CASE_DIR, GOLDEN, FakeJudge, claude_judge, evidence_for, load_run
+from .judge import judge_answer
+from .retrieval import evaluate_retrieval
 
 LOWER_IS_BETTER = {"agent.avg_model_calls"}
 
