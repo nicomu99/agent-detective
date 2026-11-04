@@ -8,7 +8,6 @@ prompt contains instructions for structured output.
 
 A function below extracts this from the model's output.
 """
-
 import json
 import re
 
